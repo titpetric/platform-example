@@ -1,3 +1,5 @@
+// This example omits the platform/module package, explicitly or autoloaded.
+// It adds a manually set up ETL package explicitly in the start() function.
 package main
 
 import (
@@ -15,25 +17,21 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-var _ registry.Module = (*internal.Handler)(nil)
-
 func main() {
+	// Register common middleware.
+	registry.AddMiddleware(middleware.Logger)
+
 	if err := start(); err != nil {
 		log.Fatalf("exit error: %v", err)
 	}
 }
 
 func start() error {
-	registry.AddMiddleware(middleware.Logger)
-
 	etl, err := internal.NewHandler()
 	if err != nil {
 		return err
 	}
 	registry.AddModule(etl)
 
-	if err := platform.Start(); err != nil {
-		return err
-	}
-	return nil
+	return platform.Start()
 }
