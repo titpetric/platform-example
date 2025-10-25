@@ -6,12 +6,17 @@ server package, which exposes a HTTP handler. As a http handler can be
 attached to a chi route, we can integrate the etl package with
 [titpetric/platform](https://github.com/titpetric/platform).
 
-There are two ways to integrate it:
+Meaningful file examples for explicit extension:
 
-- Directly by modifying your application entrypoint, [etl.go](./etl.go)
-- Indirectly by using an autoloader package and `init`, [etl_autoload.go](./etl_autoload.go)
+- [etl.go](./etl.go): add modules from logic in main
+- [internal/etl.go](./internal/etl.go): the implementation of a module
 
-The convention picked up is based on
+And the example for automatic extension (dependency inversion).
+
+- [etl_autoload.go](./etl_autoload.go): uses autoloading to register modules
+- [internal/autoload/autoload.go](./internal/autoload/autoload.go): implement module autoloading
+
+The convention picked up for automatic extension is based on
 [joho/godotenv](https://github.com/joho/godotenv). Their package
 provides an `autoload` function that declares the necessary `init` hook.
 
