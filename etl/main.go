@@ -6,7 +6,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/titpetric/platform"
-	"github.com/titpetric/platform/module"
 	"github.com/titpetric/platform/registry"
 
 	"github.com/titpetric/platform-example/etl/internal"
@@ -26,10 +25,6 @@ func main() {
 
 func start() error {
 	registry.AddMiddleware(middleware.Logger)
-
-	if err := module.LoadModules(); err != nil {
-		return err
-	}
 
 	etl, err := internal.NewHandler()
 	if err != nil {
