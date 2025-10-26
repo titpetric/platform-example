@@ -15,7 +15,7 @@ type Crontab struct {
 
 - `func NewCrontab () (*Crontab, error)`
 - `func (*Crontab) Close ()`
-- `func (*Crontab) Mount ( chi.Router)`
+- `func (*Crontab) Mount (chi.Router)`
 - `func (*Crontab) Name () string`
 
 # Example usage
