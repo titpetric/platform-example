@@ -11,8 +11,7 @@ import (
 	"github.com/titpetric/platform"
 	"github.com/titpetric/platform/registry"
 
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	// ETL requires sqlite driver to be loaded.
 	_ "modernc.org/sqlite"
 
 	// Registers the default platform modules.

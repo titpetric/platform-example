@@ -8,13 +8,8 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/titpetric/platform"
-	"github.com/titpetric/platform/registry"
-
 	"github.com/titpetric/platform-example/etl/internal"
-
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/jackc/pgx/v5/stdlib"
-	_ "modernc.org/sqlite"
+	"github.com/titpetric/platform/registry"
 )
 
 func main() {
