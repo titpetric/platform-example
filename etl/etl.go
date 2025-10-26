@@ -9,12 +9,11 @@ import (
 
 	"github.com/titpetric/platform"
 	"github.com/titpetric/platform-example/etl/internal"
-	"github.com/titpetric/platform/registry"
 )
 
 func main() {
 	// Register common middleware.
-	registry.AddMiddleware(middleware.Logger)
+	platform.AddMiddleware(middleware.Logger)
 
 	if err := start(); err != nil {
 		log.Fatalf("exit error: %v", err)
@@ -26,7 +25,7 @@ func start() error {
 	if err != nil {
 		return err
 	}
-	registry.AddModule(etl)
+	platform.AddModule(etl)
 
 	return platform.Start()
 }

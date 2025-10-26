@@ -3,8 +3,8 @@ package autoload
 import (
 	"log"
 
+	"github.com/titpetric/platform"
 	"github.com/titpetric/platform-example/etl/internal"
-	"github.com/titpetric/platform/registry"
 )
 
 func init() {
@@ -12,5 +12,5 @@ func init() {
 	if err != nil {
 		log.Fatalf("init error loading %s: %v", m.Name(), err)
 	}
-	registry.AddModule(m)
+	platform.AddModule(m)
 }

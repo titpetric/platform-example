@@ -9,7 +9,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/titpetric/platform"
-	"github.com/titpetric/platform/registry"
 
 	// ETL requires sqlite driver to be loaded.
 	_ "modernc.org/sqlite"
@@ -23,7 +22,7 @@ import (
 
 func main() {
 	// Register common middleware.
-	registry.AddMiddleware(middleware.Logger)
+	platform.AddMiddleware(middleware.Logger)
 
 	if err := platform.Start(); err != nil {
 		log.Fatalf("exit error: %v", err)

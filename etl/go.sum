@@ -46,8 +46,8 @@ github.com/stretchr/testify v1.11.0 h1:ib4sjIrwZKxE5u/Japgo/7SJV3PvgjGiRNAvTVGqQ
 github.com/stretchr/testify v1.11.0/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/titpetric/etl v0.0.0-20250811211213-37a9f27686ad h1:gNJAdhtA5a2m6O6LsT7xWXxrsIIpYr1zsDyJKSUiSe0=
 github.com/titpetric/etl v0.0.0-20250811211213-37a9f27686ad/go.mod h1:9OpuV4ZgJjFBlQWgd5DZ2pmTJMyN//Yj4w5QOvE8dRI=
-github.com/titpetric/platform v0.0.0-20251025195442-b2c13ff326b8 h1:SGajhGpjM9Bjahmp4LRUceCmTTovDCF2saqygLdNsS4=
-github.com/titpetric/platform v0.0.0-20251025195442-b2c13ff326b8/go.mod h1:2Z64Ox7TLMRiIa8mdIp2Xsn09bjgBDhfGFWFpCLCyA4=
+github.com/titpetric/platform v0.0.0-20251026175540-c8e885bd3eaa h1:lbJGEkdpCK36wFDeBWMF4v/PQHefUOleFA5zjVtwg/Y=
+github.com/titpetric/platform v0.0.0-20251026175540-c8e885bd3eaa/go.mod h1:2Z64Ox7TLMRiIa8mdIp2Xsn09bjgBDhfGFWFpCLCyA4=
 golang.org/x/crypto v0.43.0 h1:dduJYIi3A3KOfdGOHX8AVZ/jGiyPa3IbBozJ5kNuE04=
 golang.org/x/crypto v0.43.0/go.mod h1:BFbav4mRNlXJL4wNeejLpWxB7wMbc79PdRGhWKncxR0=
 golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 h1:mgKeJMpvi0yx/sU5GsxQ7p6s2wtOnGAHZWCHUM4KGzY=
