@@ -13,10 +13,11 @@ type Crontab struct {
 
 ## Function symbols
 
-- `func NewCrontab () (*Crontab, error)`
-- `func (*Crontab) Close ()`
-- `func (*Crontab) Mount (chi.Router)`
-- `func (*Crontab) Name () string`
+- `func NewCrontab() *Crontab`
+- `func (*Crontab) Name() string`
+- `func (*Crontab) Start() error`
+- `func (*Crontab) Mount(chi.Router)`
+- `func (*Crontab) Stop() error`
 
 # Example usage
 
@@ -25,10 +26,7 @@ This is how a module can be used explicitly, as shown in [main.go](./main.go);
 ```go
 func start(ctx context.Context) error {
 	// Create the module instance.
-	crontab, err := internal.NewCrontab()
-	if err != nil {
-		return err
-	}
+	crontab := internal.NewCrontab()
 
 	// Create a platform instance.
 	svc, err := platform.New()
@@ -37,13 +35,16 @@ func start(ctx context.Context) error {
 	}
 
 	// Add common middleware.
-	svc.AddMiddleware(middleware.Logger)
+	svc.Use(middleware.Logger)
 
 	// Add the crontab module. Other modules could be added.
-	svc.AddModule(crontab)
+	svc.Register(crontab)
 
 	// Start the server and wait for an exit.
-	svc.Serve(ctx)
+	if err := svc.Start(ctx); err != nil {
+		return err
+	}
+
 	svc.Wait()
 
 	return nil
