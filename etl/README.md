@@ -20,7 +20,7 @@ The convention picked up for automatic extension is based on
 [joho/godotenv](https://github.com/joho/godotenv). The package
 provides an `autoload` package that declares the necessary `init` hook.
 
-In both cases, platform/registry `Add` or `AddModule` will register
-a new plugin into the platform. Autoloading is used to avoid needing
-to modify the `main()` function further. A single autoloading package
-could load multiple modules, preventing further changes in `main.go`.
+In both cases, platform/registry `Register` will register a new plugin
+into the platform. Autoloading is used to avoid needing to modify the
+`main()` function further. A single autoloading package could load
+multiple modules, preventing further changes in `main.go`.

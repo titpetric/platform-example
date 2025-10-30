@@ -13,7 +13,7 @@ import (
 
 func main() {
 	// Register common middleware.
-	platform.AddMiddleware(middleware.Logger)
+	platform.Use(middleware.Logger)
 
 	if err := start(); err != nil {
 		log.Fatalf("exit error: %v", err)
@@ -21,11 +21,7 @@ func main() {
 }
 
 func start() error {
-	etl, err := internal.NewHandler()
-	if err != nil {
-		return err
-	}
-	platform.AddModule(etl)
+	platform.Register(internal.NewHandler())
 
 	return platform.Start()
 }

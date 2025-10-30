@@ -38,7 +38,9 @@ func (c *Crontab) Name() string {
 
 func (c *Crontab) Start() error {
 	_, err := c.scheduler.AddFunc("@every 5s", func() {
-		log.Printf("This is your cron job. Current time is: %v\n", time.Now().Format(time.RFC3339Nano))
+		log.Printf("This is your cron job starting.")
+		time.Sleep(3 * time.Second)
+		log.Printf("Cron job exiting after 3 secs.")
 	})
 	if err != nil {
 		return err

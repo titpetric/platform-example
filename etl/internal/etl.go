@@ -1,31 +1,29 @@
 package internal
 
 import (
-	"net/http"
-
-	"github.com/go-chi/chi/v5"
 	etl "github.com/titpetric/etl/server"
+	"github.com/titpetric/platform"
 )
 
 type Handler struct {
-	handler http.Handler
+	platform.UnimplementedModule
 }
 
-func NewHandler() (*Handler, error) {
-	handler, err := etl.NewHandler()
-	if err != nil {
-		return nil, err
-	}
-	return &Handler{handler}, nil
+func NewHandler() *Handler {
+	return &Handler{}
 }
 
 func (h *Handler) Name() string {
 	return "etl"
 }
 
-func (h *Handler) Mount(r chi.Router) {
-	r.Mount("/etl/", h.handler)
-}
+func (h *Handler) Mount(r platform.Router) error {
+	handler, err := etl.NewHandler()
+	if err != nil {
+		return err
+	}
 
-func (*Handler) Close() {
+	r.Mount("/etl/", handler)
+
+	return nil
 }

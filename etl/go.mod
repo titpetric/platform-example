@@ -5,7 +5,7 @@ go 1.25.3
 require (
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/titpetric/etl v0.0.0-20250811211213-37a9f27686ad
-	github.com/titpetric/platform v0.0.0-20251026175540-c8e885bd3eaa
+	github.com/titpetric/platform v0.0.0-20251030190236-fecad6851fab
 	modernc.org/sqlite v1.39.1
 )
 
