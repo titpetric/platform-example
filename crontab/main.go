@@ -20,15 +20,11 @@ func main() {
 func start(ctx context.Context) error {
 	crontab := internal.NewCrontab()
 
-	svc, err := platform.New()
-	if err != nil {
-		return err
-	}
-
+	svc := platform.New(nil)
 	svc.Use(middleware.Logger)
 	svc.Register(crontab)
 
-	if svc.Start(ctx); err != nil {
+	if err := svc.Start(ctx); err != nil {
 		return err
 	}
 

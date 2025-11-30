@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"log"
 	"os"
 	"time"
@@ -36,7 +37,7 @@ func (c *Crontab) Name() string {
 	return "crontab"
 }
 
-func (c *Crontab) Start() error {
+func (c *Crontab) Start(context.Context) error {
 	_, err := c.scheduler.AddFunc("@every 5s", func() {
 		log.Printf("This is your cron job starting.")
 		time.Sleep(3 * time.Second)
@@ -50,7 +51,7 @@ func (c *Crontab) Start() error {
 	return nil
 }
 
-func (c *Crontab) Stop() error {
+func (c *Crontab) Stop(context.Context) error {
 	<-c.scheduler.Stop().Done()
 	return nil
 }
