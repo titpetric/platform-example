@@ -45,7 +45,7 @@ func (m *Module) Name() string {
 }
 
 // Mount registers the blog routes with the router
-func (m *Module) Mount(router platform.Router) error {
+func (m *Module) Mount(_ context.Context, router platform.Router) error {
 	// Create handlers using the module's storage
 	h, err := NewHandlers(m.repository)
 	if err != nil {
@@ -113,7 +113,7 @@ func (m *Module) Start(ctx context.Context) error {
 }
 
 // Stop is called when the module is shutting down
-func (m *Module) Stop() error {
+func (m *Module) Stop(context.Context) error {
 	// Nothing to clean up - database is managed by platform
 	return nil
 }

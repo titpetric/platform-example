@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/russross/blackfriday/v2"
 
+	"github.com/titpetric/platform-example/blog/markdown"
 	"github.com/titpetric/platform-example/blog/model"
 	"github.com/titpetric/platform-example/blog/storage"
 	"github.com/titpetric/platform-example/blog/template"
@@ -160,9 +160,10 @@ func (h *Handlers) GetArticleHTML(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
 
-	// Strip front matter and convert markdown to HTML
+	// Strip front matter and convert markdown to HTML with syntax highlighting
 	contentWithoutFrontMatter := template.StripFrontMatter(article.Content)
-	htmlContent := blackfriday.Run([]byte(contentWithoutFrontMatter))
+	mdRenderer := markdown.NewRenderer()
+	htmlContent := mdRenderer.Render([]byte(contentWithoutFrontMatter))
 
 	// Create PostData and render
 	postData := h.views.PostFromArticle(article, string(htmlContent))

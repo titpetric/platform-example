@@ -106,13 +106,16 @@ task ci            # Runs: fmt:check, lint, vet, test, coverage:check
 ```
 blog/
 ├── model/              # Data types and structures
+├── markdown/           # Markdown rendering with syntax highlighting
+│   └── markdown.go     # Markdown to HTML conversion with Chroma
 ├── storage/            # Database layer
 │   ├── storage.go      # Public interface
 │   ├── articles.go     # SQL operations
 │   ├── db.go          # Connection helper
 │   ├── storage_test.go # Unit tests
 │   └── integration_test.go  # Integration tests
-├── template/          # Template rendering
+├── template/           # Template rendering
+├── theme/              # Static theme assets
 ├── handlers.go        # HTTP handlers
 ├── blog.go           # Module implementation
 └── schema/           # Database schema migrations
@@ -161,6 +164,7 @@ task deps
 - `github.com/mattn/go-sqlite3` - SQLite driver
 - `github.com/titpetric/platform` - Platform framework
 - `github.com/russross/blackfriday/v2` - Markdown rendering
+- `github.com/alecthomas/chroma/v2` - Syntax highlighting for code blocks
 - `github.com/titpetric/vuego` - Template engine
 - `gopkg.in/yaml.v3` - YAML parsing
 

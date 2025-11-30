@@ -3,7 +3,7 @@ module github.com/titpetric/platform-example/blog
 go 1.25.4
 
 require (
-	github.com/davecgh/go-spew v1.1.1
+	github.com/alecthomas/chroma/v2 v2.14.0
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/russross/blackfriday/v2 v2.1.0
@@ -17,6 +17,8 @@ require (
 require (
 	github.com/XSAM/otelsql v0.40.0 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dlclark/regexp2 v1.11.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/expr-lang/expr v1.17.6 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
