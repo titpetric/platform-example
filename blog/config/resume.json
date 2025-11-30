@@ -1,0 +1,196 @@
+{
+  "name": "Ryan Mulligan",
+  "pronouns": "he/him",
+  "title": "Front-end Engineer + Creative Developer",
+  "info": [
+    {
+      "category": "Current Location",
+      "label": "Seattle, Washington",
+      "icon": "map-pin"
+    },
+    {
+      "category": "Email",
+      "label": "hey@ryanmulligan.dev",
+      "url": "mailto:hey@ryanmulligan.dev?subject=I discovered your resume, tell me more",
+      "icon": "email"
+    },
+    {
+      "category": "View resume on the web",
+      "label": "ryanmulligan.dev/resume",
+      "url": "https://ryanmulligan.dev/resume",
+      "icon": "cursor-click"
+    },
+    {
+      "category": "Website",
+      "label": "ryanmulligan.dev",
+      "url": "https://ryanmulligan.dev",
+      "icon": "user"
+    },
+    {
+      "category": "LinkedIn",
+      "label": "linkedin.com/in/mulliganryan",
+      "url": "https://www.linkedin.com/in/mulliganryan",
+      "icon": "linkedin"
+    }
+  ],
+  "introduction": "<p>I'm a creative front-end engineer with over a decade of experience building for the web. I've developed a well-rounded skillset servicing both product and marketing teams. My back catalog of roles range from individual contribution to management, team building, and leadership.</p><p>I perpetually advocate for modern web standards, embrace the web platform, and believe in the rule of least power—use the simplest language to do the job well, then scale as it becomes necessary. My priorities are influenced by empathy: lift up those around me so we may succeed together, always care for the end user, and deliver a performant, inclusive, and accessible web.</p>",
+  "experience": [
+    {
+      "company": "Netlify",
+      "location": "Remote",
+      "roles": [
+        {
+          "title": "Staff Software Engineer",
+          "type": "Full-time",
+          "startDate": "February 2022",
+          "endDate": "Present",
+          "description": "Engineering team leader building web properties within the marketing ecosystem. Managed team and web projects, developed new, creative facets for our sites, architected content schemas for our CMS, and connected multiple datasets to our front end templates and visual editor. Actively worked on site rebuild, foundational design token system and component architecture while also maintaining legacy codebases. Lead team enablement strategies to streamline campaign creation."
+        }
+      ]
+    },
+    {
+      "company": "Inspirato",
+      "location": "Denver, Colorado",
+      "roles": [
+        {
+          "title": "Manager, UI Engineering",
+          "type": "Full-time",
+          "startDate": "May 2021",
+          "endDate": "January 2022",
+          "description": "UI engineering product team lead. Management role extended previous senior level duties to include people management, working with recruitment in the hiring process, and providing direction towards organizational growth."
+        },
+        {
+          "title": "Senior UI Engineer",
+          "type": "Full-time",
+          "startDate": "August 2019",
+          "endDate": "May 2021",
+          "description": "Front-end engineer on the Pass UX and List Architecture team. Built our latest front-end design system, developed consumer-facing React application for property listings and trip collections, and evolved user experience towards a more stable, performant, and accessible product."
+        }
+      ]
+    },
+    {
+      "company": "Elevated Third",
+      "location": "Seattle, Washington",
+      "roles": [
+        {
+          "title": "Senior Frontend Developer",
+          "type": "Full-time",
+          "startDate": "July 2018",
+          "endDate": "April 2019",
+          "description": "Helped build and manage a development at new remote location. Lead web engineer on multiple projects, presented project build specs, estimated feature scope, and worked directly with many clients as a technical liason. On management side, I mentored junior-level team members both in office and virtual."
+        }
+      ]
+    },
+    {
+      "company": "Expedia Group",
+      "location": "Bellevue, Washington",
+      "roles": [
+        {
+          "title": "Software Dev Engineer II",
+          "type": "Full-time",
+          "startDate": "June 2017",
+          "endDate": "May 2018",
+          "description": "Core member of Global UI Engineering Team focused on toolkit of components used across applications. Led the Front-end Improvements Team, providing engineering team guidance, development direction, and code contributions for quality and consistency across app presentation layers."
+        },
+        {
+          "title": "Senior Design Engineer",
+          "type": "Full-time",
+          "startDate": "June 2016",
+          "endDate": "June 2017",
+          "description": "Built responsive product prototypes concentrated around business travel consumer needs. Helped conduct user studies and design towards rapid, iterative processes for UX feature A/B testing. Contributed to global UI toolkit and to align product with design standards."
+        }
+      ]
+    },
+    {
+      "company": "Elevated Third",
+      "location": "Denver, Colorado",
+      "roles": [
+        {
+          "title": "Senior Frontend Developer",
+          "type": "Full-time",
+          "startDate": "May 2012",
+          "endDate": "May 2016",
+          "description": "Front-end web development, Drupal site theming, admin/client-facing site configuration, custom module development, and some back-end development. Estimated new projects and feature scope. Information architecture and content schemas for new site builds."
+        }
+      ]
+    }
+  ],
+  "education": {
+    "school": "Ramapo College of New Jersey",
+    "degree": "Bachelors, Communications, Graphic Design",
+    "startDate": "2001",
+    "endDate": "2005"
+  },
+  "awards": [
+    {
+      "title": "The Most Hearted of 2022",
+      "company": "CodePen",
+      "date": "December 2022",
+      "description": "#2 in the top 100 most hearted projects of 2022 on CodePen.",
+      "url": "https://codepen.io/2022/popular/pens"
+    },
+    {
+      "title": "Big Dreamer Award: Most Innovative and Creative",
+      "company": "Inspirato Tech and Product",
+      "date": "February 2021",
+      "description": "Awarded for work done in 2020 based on team votes."
+    },
+    {
+      "title": "The Most Hearted of 2020",
+      "company": "CodePen",
+      "date": "December 2020",
+      "description": "#1 in the top 100 most hearted projects of 2020 on CodePen.",
+      "url": "https://codepen.io/2020/popular/pens"
+    },
+    {
+      "title": "The Most Hearted of 2019",
+      "company": "CodePen",
+      "date": "December 2020",
+      "description": "#34 and #18 in the top 100 most hearted projects of 2019.",
+      "url": "https://codepen.io/2019/popular/pens"
+    },
+    {
+      "title": "The Most Hearted of 2016",
+      "company": "CodePen",
+      "date": "January 2017",
+      "description": "#90 of the top 100 most hearted pens of 2016.",
+      "url": "http://codepen.io/2016/popular/pens"
+    }
+  ],
+  "skills": {
+    "content": "<p>My primary goal is to build delightful, inclusive online experiences using the foundational building blocks of the web. Develop systems that are straightforward, extensible, and well-documented. Use the simplest language suitable for the job before jumping into more complex frameworks. Keep code portable and reusable. Below highlights some general areas of expertise and familiarity.</p>",
+    "list": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Accessibility",
+      "Performance",
+      "Intrinsic design",
+      "Animation",
+      "Web Components",
+      "Design systems",
+      "Prototyping",
+      "TypeScript",
+      "Astro",
+      "Next.js",
+      "React",
+      "Vue",
+      "Svelte",
+      "11ty",
+      "GSAP",
+      "Framer Motion",
+      "Radix UI",
+      "Tailwind CSS",
+      "Styled Components",
+      "OpenAI",
+      "Sanity",
+      "Contentful",
+      "GraphQL",
+      "GROQ",
+      "Data architecture",
+      "Structured content",
+      "Website and app development",
+      "Team leadership and mentoring"
+    ]
+  }
+}

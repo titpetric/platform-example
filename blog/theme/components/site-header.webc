@@ -1,0 +1,74 @@
+<script webc:setup>
+  const { menu } = $data.navigation;
+</script>
+
+<header webc:root="override">
+  <nav class="cluster">
+    <ul class="cluster" role="list">
+      <li class="jump-to-content">
+        <a href="#main" class="text-label">Jump to main content</a>
+      </li>
+      <li webc:if="index < 3" webc:for="(item, index) of menu">
+        <a
+          :href="item.url"
+          :aria-current="item.url === $data.page.url ? 'page' : null"
+          @text="item.label"></a>
+      </li>
+    </ul>
+    <vuego include="theme/components/theme-machine.vuego"></vuego>
+  </nav>
+</header>
+
+<style webc:scoped="site-header">
+  :host {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    padding-inline: var(--page-gutters);
+    margin-block: var(--page-gutters) var(--space-xl);
+    z-index: 1;
+  }
+
+  nav {
+    position: relative;
+  }
+
+  @media (max-width: 40rem) {
+    nav {
+      --column-gap: clamp(var(--space-s), 5vw, var(--space-m));
+      --row-gap: var(--space-s);
+      --justify: space-between;
+
+      inline-size: 100%;
+    }
+  }
+
+  a {
+    display: grid;
+    place-items: center;
+    place-content: center;
+    color: currentcolor;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-theme-offset);
+  }
+
+  .jump-to-content {
+    position: absolute;
+    top: -9999px;
+    left: 0;
+
+    &:focus-within {
+      top: 50%;
+      translate: 0 -50%;
+      z-index: 1;
+    }
+
+    a {
+      padding: var(--space-2xs) var(--space-s);
+      background-color: var(--color-bg);
+    }
+  }
+</style>

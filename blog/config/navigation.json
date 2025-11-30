@@ -1,0 +1,82 @@
+{
+  "appearances": [
+    {
+      "id": "system",
+      "icon": "monitor",
+      "label": "System",
+      "value": "system"
+    },
+    {
+      "id": "light",
+      "icon": "sun",
+      "label": "Light",
+      "value": "light"
+    },
+    {
+      "id": "dark",
+      "icon": "moon",
+      "label": "Dark",
+      "value": "dark"
+    }
+  ],
+  "menu": [
+    {
+      "id": "home",
+      "label": "Home",
+      "url": "/"
+    },
+    {
+      "id": "blog",
+      "label": "Blog",
+      "url": "/blog/"
+    },
+    {
+      "id": "rss",
+      "label": "RSS",
+      "url": "/feed.xml"
+    },
+    {
+      "id": "blogroll",
+      "label": "Blogroll",
+      "url": "/blogroll/"
+    },
+    {
+      "id": "issue",
+      "label": "Report an issue",
+      "url": "https://github.com/hexagoncircle/ryan-mulligan-dev/issues/new",
+      "target": "_blank"
+    }
+  ],
+  "social": [
+    {
+      "id": "mastodon",
+      "label": "Mastodon",
+      "url": "https://fosstodon.org/@hexagoncircle"
+    },
+    {
+      "id": "codepen",
+      "label": "CodePen",
+      "url": "https://codepen.io/hexagoncircle"
+    },
+    {
+      "id": "github",
+      "label": "GitHub",
+      "url": "https://github.com/hexagoncircle"
+    },
+    {
+      "id": "bluesky",
+      "label": "Bluesky",
+      "url": "https://bsky.app/profile/ryanmulligan.dev"
+    },
+    {
+      "id": "linkedin-fill",
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/mulliganryan/"
+    },
+    {
+      "id": "buymeacoffee",
+      "label": "Buy me a coffee",
+      "url": "https://buymeacoffee.com/ryanmulligan"
+    }
+  ]
+}

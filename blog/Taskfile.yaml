@@ -1,0 +1,121 @@
+version: '3'
+
+vars:
+  COVERAGE_MIN: '70'
+
+tasks:
+  default:
+    desc: Start the blog service
+    env:
+      PLATFORM_DB_BLOG: "sqlite://blog.db"
+    cmds:
+      - pkill -9 blog || true
+      - go run ./cmd/blog
+
+  playground:
+    cmd: go run github.com/titpetric/vuego/cmd/vuego-playground theme
+
+  fmt:
+    desc: Format Go code
+    cmds:
+      - go fmt ./...
+      - goimports -w .
+
+  fmt-check:
+    desc: Check if code is formatted
+    cmds:
+      - go fmt ./... && test -z "$(git diff)" || (echo "Code not formatted"; exit 1)
+
+  lint:
+    desc: Run golangci-lint
+    cmds:
+      - golangci-lint run ./...
+
+  build:
+    desc: Build the module
+    cmds:
+      - go build ./...
+
+  test:
+    desc: Run all tests
+    cmds:
+      - go test -v ./...
+
+  test-unit:
+    desc: Run unit tests only
+    cmds:
+      - go test -v -short ./...
+
+  test-integration:
+    desc: Run integration tests only
+    cmds:
+      - go test -v -run Integration ./storage
+
+  test-coverage:
+    desc: Run tests with coverage
+    cmds:
+      - go test -v -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out -o coverage.html
+
+  test-coverage-check:
+    desc: Check test coverage meets minimum threshold
+    cmds:
+      - go test -v -coverprofile=coverage.out ./...
+      - go tool cover -func=coverage.out | tail -1
+
+  bench:
+    desc: Run benchmarks
+    cmds:
+      - go test -bench=. -benchmem ./...
+
+  bench-cpu:
+    desc: Run benchmarks with CPU profiling
+    cmds:
+      - go test -bench=. -benchmem -cpuprofile=cpu.prof ./...
+      - go tool pprof -http=:8080 cpu.prof
+
+  bench-memory:
+    desc: Run benchmarks with memory profiling
+    cmds:
+      - go test -bench=. -benchmem -memprofile=mem.prof ./...
+      - go tool pprof -http=:8080 mem.prof
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - go vet ./...
+
+  tidy:
+    desc: Tidy dependencies
+    cmds:
+      - go mod tidy
+
+  deps:
+    desc: Check for dependency updates
+    cmds:
+      - go list -u -m all
+
+  clean:
+    desc: Clean build artifacts and test files
+    cmds:
+      - rm -f coverage.out coverage.html
+      - rm -f cpu.prof mem.prof
+      - go clean ./...
+
+  ci:
+    desc: Run CI checks (fmt, lint, vet, test, coverage)
+    cmds:
+      - task fmt-check
+      - task lint
+      - task vet
+      - task test
+      - task test-coverage-check
+
+  all:
+    desc: Format, lint, vet, test, and build
+    cmds:
+      - task fmt
+      - task lint
+      - task vet
+      - task test
+      - task build

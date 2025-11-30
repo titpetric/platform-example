@@ -1,0 +1,117 @@
+[
+  {
+    "name": "default",
+    "light": {
+      "bg": "#fffefd",
+      "bg-accent": "#f7f5f5",
+      "bg-code": "#0f172a",
+      "text": "#020617",
+      "text-accent": "#334155",
+      "text-code": "#f1f5f9",
+      "link": "#2563eb",
+      "link-hover": "#ec4899",
+      "theme": "#ffedd5",
+      "theme-muted": "#fff5e7",
+      "theme-accent": "#fed7aa",
+      "theme-offset": "#ef4444"
+    },
+    "dark": {
+      "bg": "#020617",
+      "bg-accent": "#0f172a",
+      "bg-code": "#0f172a",
+      "text": "#f8fafc",
+      "text-accent": "#f1f5f9",
+      "link": "#7ab6ff",
+      "link-hover": "#93c5fd",
+      "theme": "#172554",
+      "theme-muted": "#0e1737",
+      "theme-accent": "#1e3a8a",
+      "theme-offset": "#0ea5e9"
+    }
+  },
+  {
+    "name": "pink",
+    "light": {
+      "theme": "#fce7f3",
+      "theme-muted": "#fff5fb",
+      "theme-accent": " #f9a8d4",
+      "theme-offset": "#ec4899"
+    },
+    "dark": {
+      "bg": "#0c0508",
+      "bg-accent": "#240813",
+      "bg-code": "#240813",
+      "theme": "#4f0c27",
+      "theme-muted": "#3b0a1e",
+      "theme-accent": "#9d174d",
+      "theme-offset": "#f9a8d4"
+    }
+  },
+  {
+    "name": "blue",
+    "light": {
+      "theme": "#dbeafe",
+      "theme-muted": "#edf4ff",
+      "theme-accent": "#93c5fd",
+      "theme-offset": "#3b82f6"
+    },
+    "dark": {
+      "theme": "#082f49",
+      "theme-muted": "#072437",
+      "theme-accent": "#0284c7",
+      "theme-offset": "#38bdf8"
+    }
+  },
+  {
+    "name": "green",
+    "light": {
+      "theme": "#d1fae5",
+      "theme-muted": "#f0fff7",
+      "theme-accent": "#6ee7b7",
+      "theme-offset": "#10b981"
+    },
+    "dark": {
+      "bg": "#0d1110",
+      "bg-accent": "#121e1b",
+      "bg-code": "#121e1b",
+      "theme": "#064e3b",
+      "theme-muted": "#0b4032",
+      "theme-accent": "#047857",
+      "theme-offset": "#34d399"
+    }
+  },
+  {
+    "name": "purple",
+    "light": {
+      "theme": "#f3e8ff",
+      "theme-muted": "#f9f4ff",
+      "theme-accent": "#d8b4fe",
+      "theme-offset": "#9333ea"
+    },
+    "dark": {
+      "bg": "#0f031a",
+      "bg-accent": "#1f0733",
+      "bg-code": "#1f0733",
+      "theme": "#581c87",
+      "theme-muted": "#491f6a",
+      "theme-accent": "#9333ea",
+      "theme-offset": "#c084fc"
+    }
+  },
+  {
+    "name": "slate",
+    "light": {
+      "theme": "#f1f5f9",
+      "theme-muted": "#e6edf2",
+      "theme-accent": "#cbd5e1",
+      "theme-offset": "#475569"
+    },
+    "dark": {
+      "bg": "#020617",
+      "theme": "#1e293b",
+      "theme-muted": "#1c232e",
+      "theme-accent": "#334155",
+      "theme-offset": "#9faec5"
+    }
+  }
+]
