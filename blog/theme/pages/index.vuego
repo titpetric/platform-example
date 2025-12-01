@@ -1,3 +1,7 @@
+---
+layout: "base"
+---
+
 <h1>Welcome</h1>
 
 <p>Welcome to the blog. Check out the latest articles below.</p>
