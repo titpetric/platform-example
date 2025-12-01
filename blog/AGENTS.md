@@ -123,7 +123,7 @@ blog/
 │   ├── db.go          # Connection helper
 │   ├── storage_test.go # Unit tests
 │   └── integration_test.go  # Integration tests
-├── template/           # Template rendering
+├── view/               # Template rendering
 ├── theme/              # Static theme assets
 ├── handlers.go        # HTTP handlers
 ├── blog.go           # Module implementation

@@ -5,25 +5,24 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 
 	chi "github.com/go-chi/chi/v5"
 
 	"github.com/titpetric/platform-example/blog/markdown"
 	"github.com/titpetric/platform-example/blog/model"
 	"github.com/titpetric/platform-example/blog/storage"
-	"github.com/titpetric/platform-example/blog/template"
+	"github.com/titpetric/platform-example/blog/view"
 )
 
 // Handlers handles HTTP requests for the blog module
 type Handlers struct {
 	repository *storage.Storage
-	views      *template.Views
+	views      *view.Views
 }
 
 // NewHandlers creates a new Handlers instance with the given storage
 func NewHandlers(repo *storage.Storage) (*Handlers, error) {
-	views, err := template.NewViews(os.DirFS("theme"))
+	views, err := view.NewViews(os.DirFS("theme"))
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +160,7 @@ func (h *Handlers) GetArticleHTML(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "public, max-age=3600")
 
 	// Strip front matter and convert markdown to HTML with syntax highlighting
-	contentWithoutFrontMatter := template.StripFrontMatter(article.Content)
+	contentWithoutFrontMatter := view.StripFrontMatter(article.Content)
 	mdRenderer := markdown.NewRenderer()
 	htmlContent := mdRenderer.Render([]byte(contentWithoutFrontMatter))
 
@@ -176,23 +175,6 @@ func (h *Handlers) GetArticleHTML(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(html))
 }
 
-// Helper middleware and utilities
-
-// ContentNegotiation middleware handles Accept header for JSON vs HTML
-func ContentNegotiation(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		accept := r.Header.Get("Accept")
-
-		if strings.Contains(accept, "application/json") {
-			w.Header().Set("X-Content-Type", "json")
-		} else if strings.Contains(accept, "text/html") || accept == "" {
-			w.Header().Set("X-Content-Type", "html")
-		}
-
-		next.ServeHTTP(w, r)
-	})
-}
-
 // GetAtomFeed returns an Atom XML feed of all articles
 func (h *Handlers) GetAtomFeed(w http.ResponseWriter, r *http.Request) {
 	articles, err := h.repository.GetArticles(r.Context(), 0, 20)
@@ -201,7 +183,7 @@ func (h *Handlers) GetAtomFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/atom+xml; charset=utf-8")
+	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
 
 	// Generate atom feed

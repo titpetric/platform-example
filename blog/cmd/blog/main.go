@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/titpetric/platform"
+	"github.com/titpetric/platform-app/modules/user"
 
 	"github.com/titpetric/platform-example/blog"
 )
@@ -22,6 +23,7 @@ func start(ctx context.Context) error {
 	svc := platform.New(opts)
 
 	svc.Use(middleware.Logger)
+	svc.Register(user.NewHandler())
 	svc.Register(blog.NewModule("./data"))
 
 	if err := svc.Start(ctx); err != nil {

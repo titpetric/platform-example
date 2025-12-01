@@ -21,6 +21,14 @@ tasks:
     desc: Run the vuego template playground
     cmd: go run github.com/titpetric/vuego/cmd/vuego-playground theme
 
+  generate:
+    desc: Generate blog snapshot
+    env:
+      PLATFORM_DB_BLOG: "sqlite://blog.db"
+    cmds:
+      - task: fmt
+      - go run ./cmd/generate
+
   fmt:
     desc: Format code and organize imports
     cmds:
@@ -58,7 +66,7 @@ tasks:
     env:
       GOTOOLCHAIN: '{{.toolchain}}'
     cmds:
-      - go test -failfast -count=1 -cover -coverpkg=./... -coverprofile=pkg.cov ./markdown ./storage
+      - go test -failfast -count=1 -cover -coverpkg=./... -coverprofile=pkg.cov ./...
 
   test:unit:
     desc: Run unit tests only

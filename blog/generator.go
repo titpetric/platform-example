@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/titpetric/platform-example/blog/markdown"
-	"github.com/titpetric/platform-example/blog/template"
+	"github.com/titpetric/platform-example/blog/view"
 )
 
 // Generator generates static HTML files from blog content
@@ -67,7 +67,7 @@ func (g *Generator) Generate(ctx context.Context) error {
 		fmt.Printf("Generating blog/%s/index.html...\n", modelArticle.Slug)
 
 		// Convert markdown to HTML
-		contentWithoutFrontMatter := template.StripFrontMatter(modelArticle.Content)
+		contentWithoutFrontMatter := view.StripFrontMatter(modelArticle.Content)
 		htmlContent := mdRenderer.Render([]byte(contentWithoutFrontMatter))
 
 		// Create PostData
@@ -191,7 +191,7 @@ func (g *Generator) walkPages(ctx context.Context, h *Handlers, dirPath string, 
 }
 
 // generateArticlePage generates an individual article page
-func (g *Generator) generateArticlePage(ctx context.Context, h *Handlers, postData *template.PostData) error {
+func (g *Generator) generateArticlePage(ctx context.Context, h *Handlers, postData *view.PostData) error {
 	html, err := h.views.Post(ctx, postData)
 	if err != nil {
 		return err

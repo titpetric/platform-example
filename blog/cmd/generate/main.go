@@ -5,8 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
-
-	"github.com/titpetric/platform"
+	"time"
 
 	"github.com/titpetric/platform-example/blog"
 	"github.com/titpetric/platform-example/blog/storage"
@@ -20,19 +19,14 @@ func main() {
 	ctx := context.Background()
 
 	// Initialize platform (database only)
-	opts := platform.NewOptions()
-	svc := platform.New(opts)
-	if err := svc.Start(ctx); err != nil {
-		log.Fatalf("failed to start platform: %v", err)
-	}
-	defer svc.Stop()
-
 	if err := generate(ctx, *dataDir, *outputDir); err != nil {
 		log.Fatalf("generation failed: %v", err)
 	}
 }
 
 func generate(ctx context.Context, dataDir, outputDir string) error {
+	start := time.Now()
+
 	// Get database from platform
 	db, err := storage.DB(ctx)
 	if err != nil {
@@ -64,6 +58,8 @@ func generate(ctx context.Context, dataDir, outputDir string) error {
 		return fmt.Errorf("generation failed: %w", err)
 	}
 
-	fmt.Println("✓ Generation complete")
+	duration := time.Since(start)
+
+	fmt.Println("✓ Completed in", duration)
 	return nil
 }

@@ -12,6 +12,7 @@ import (
 	_ "modernc.org/sqlite"
 
 	"github.com/titpetric/platform"
+	"github.com/titpetric/platform-app/modules/user"
 	yaml "gopkg.in/yaml.v3"
 
 	"github.com/titpetric/platform-example/blog/model"
@@ -46,35 +47,40 @@ func (m *Module) Name() string {
 }
 
 // Mount registers the blog routes with the router
-func (m *Module) Mount(_ context.Context, router platform.Router) error {
+func (m *Module) Mount(_ context.Context, r platform.Router) error {
 	// Create handlers using the module's storage
 	h, err := NewHandlers(m.repository)
 	if err != nil {
 		return err
 	}
 
-	// Static files
 	assetFS := http.StripPrefix("/assets", http.FileServer(http.Dir("theme/assets")))
-	router.Get("/assets/css/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
-	router.Get("/assets/fonts/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
-	router.Get("/assets/icons/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
-	router.Get("/assets/favicon/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
-	router.Get("/assets/robots.txt", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
-	router.Get("/assets/site.webmanifest", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
 
-	// API Routes (JSON)
-	router.Get("/api/blog/articles", h.ListArticlesJSON)
-	router.Get("/api/blog/articles/{slug}", h.GetArticleJSON)
-	router.Get("/api/blog/search", h.SearchArticlesJSON)
+	r.Group(func(r platform.Router) {
+		r.Use(user.Middleware)
 
-	// HTML Routes
-	router.Get("/", h.IndexHTML)
-	router.Get("/blog/", h.ListArticlesHTML)
-	router.Get("/blog/{slug}", h.GetArticleHTML)
-	router.Get("/blog/{slug}/", h.GetArticleHTML)
+		// Static files
+		r.Get("/assets/css/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+		r.Get("/assets/fonts/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+		r.Get("/assets/icons/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+		r.Get("/assets/favicon/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+		r.Get("/assets/robots.txt", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+		r.Get("/assets/site.webmanifest", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
 
-	// Feed Routes
-	router.Get("/feed.xml", h.GetAtomFeed)
+		// API Routes (JSON)
+		r.Get("/api/blog/articles", h.ListArticlesJSON)
+		r.Get("/api/blog/articles/{slug}", h.GetArticleJSON)
+		r.Get("/api/blog/search", h.SearchArticlesJSON)
+
+		// HTML Routes
+		r.Get("/", h.IndexHTML)
+		r.Get("/blog/", h.ListArticlesHTML)
+		r.Get("/blog/{slug}", h.GetArticleHTML)
+		r.Get("/blog/{slug}/", h.GetArticleHTML)
+
+		// Feed Routes
+		r.Get("/feed.xml", h.GetAtomFeed)
+	})
 
 	return nil
 }
