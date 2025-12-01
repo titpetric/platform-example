@@ -1,8 +1,9 @@
-// This example omits the platform/module package, explicitly or autoloaded.
+// This example omits the platform/pkg/drivers package.
 // It adds a manually set up ETL package explicitly in the start() function.
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/go-chi/chi/v5/middleware"
@@ -12,16 +13,21 @@ import (
 )
 
 func main() {
-	// Register common middleware.
-	platform.Use(middleware.Logger)
-
-	if err := start(); err != nil {
+	if err := start(context.Background()); err != nil {
 		log.Fatalf("exit error: %v", err)
 	}
 }
 
-func start() error {
-	platform.Register(internal.NewHandler())
+func start(ctx context.Context) error {
+	p := platform.New(nil)
+	p.Use(middleware.Logger)
+	p.Register(internal.NewHandler())
 
-	return platform.Start()
+	err := p.Start(ctx)
+	if err != nil {
+		return err
+	}
+
+	p.Wait()
+	return nil
 }

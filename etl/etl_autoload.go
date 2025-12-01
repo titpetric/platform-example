@@ -10,11 +10,8 @@ import (
 
 	"github.com/titpetric/platform"
 
-	// ETL requires sqlite driver to be loaded.
-	_ "modernc.org/sqlite"
-
 	// Registers the default platform modules.
-	_ "github.com/titpetric/platform/module/autoload"
+	_ "github.com/titpetric/platform/pkg/drivers"
 
 	// Registers the etl module.
 	_ "github.com/titpetric/platform-example/etl/internal/autoload"
@@ -24,7 +21,9 @@ func main() {
 	// Register common middleware.
 	platform.Use(middleware.Logger)
 
-	if err := platform.Start(); err != nil {
+	p, err := platform.Start()
+	if err != nil {
 		log.Fatalf("exit error: %v", err)
 	}
+	p.Wait()
 }
