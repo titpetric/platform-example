@@ -34,11 +34,16 @@ func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string,
 		newestDate = time.Now()
 	}
 
+	var language string
+	if lang, ok := meta["language"].(string); ok {
+		language = lang
+	}
+
 	xml := fmt.Sprintf(`<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:base="%s">
   <title>%s</title>
   <subtitle>Blogging general thoughts and rambles, code snippets, and front-end web dev discoveries</subtitle>
-  <link href="%s/atom.xml" rel="self"/>
+  <link href="%s/feed.xml" rel="self"/>
   <link href="%s"/>
   <updated>%s</updated>
   <id>%s</id>
@@ -58,9 +63,9 @@ func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string,
     <link href="%s/blog/%s"/>
     <updated>%s</updated>
     <id>%s/blog/%s</id>
-    <content type="html"><![CDATA[%s]]></content>
+    <content xml:lang="%s" type="html">%s</content>
   </entry>
-`, escapeXML(article.Title), meta["url"], article.Slug, article.Date.Format(time.RFC3339), meta["url"], article.Slug, contentWithoutFrontMatter)
+`, escapeXML(article.Title), meta["url"], article.Slug, article.Date.Format(time.RFC3339), meta["url"], article.Slug, language, escapeXML(contentWithoutFrontMatter))
 
 		xml += entryXML
 	}
