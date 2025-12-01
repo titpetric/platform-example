@@ -12,10 +12,10 @@
     <meta name="author" :content="meta.author.name" />
 
     <!-- favicon-trary to popular belief -->
-    <link rel="icon" href="/favicon/favicon.ico" sizes="32x32" />
-    <link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" href="/assets/favicon/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/assets/favicon/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/assets/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="/assets/site.webmanifest" />
 
     <!-- social club -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -52,8 +52,8 @@
     </script>
 
     <!-- assets the situation -->
-    <link rel="stylesheet" href="/css/themes.css" />
-    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/assets/css/themes.css" />
+    <link rel="stylesheet" href="/assets/css/styles.css" />
     <style v-html="getCss(page.url)"></style>
   </head>
   <body>

@@ -1,36 +1,95 @@
-# Blog
+# Blog Module
 
-This is a blog application. It uses the `user` module to provide session functionality,
-and defines multiple roles with access to a blog. The roles are:
+A blog module for the platform that provides article management, search, and templating functionality.
 
-- Owner: can manage articles and users
-- Editor: can only manage articles, can't manage users
-- Reviewer: can suggest edits pending approval by owner/editor
+## Features
 
-Owners can do everything, including the review flow, suggesting changes
-/ editing, without necessarily go into the editor. Approval can be made
-separately. Think of it as GitHub comments with code change suggestions.
+- **Markdown-based articles** with YAML front matter
+- **Full-text search** with SQLite FTS5
+- **Template rendering** with vuego
+- **Syntax highlighting** for code blocks with Chroma
+- **HTML and JSON APIs** with content negotiation
+- **Cache control** for optimal performance
 
-## Theme
+## Quick Start
 
-The blog theme is a variant of `ryan-mulligan-dev`. The original templates
-were ported to [vuego](https://github.com/titpetric/vuego). The template
-structure is comprised of two folders:
+### Configuration
 
-- `theme` - the page layouts (index, post)
-- `theme/components` - components and data files for inclusion
-- `theme/assets` - static file assets (css, js)
+Set the database connection:
 
-## Storage
+```bash
+export PLATFORM_DB_BLOG="sqlite:///tmp/blog.db"  # or sqlite://:memory: for development
+```
 
-The blog system scans a source folder for markdown files. They are read,
-their metadata is decoded to decide on which page layout to render, and
-as needed the markdown is rendered to html.
+### Create Articles
 
-After indexing the files, the application provides search functionality.
-The API will return HTML if `text/html` is requested. It will return JSON
-if requested with the appropriate Content-Type header.
+Add markdown files to `data/` directory:
 
-The storage in use is a sqlite `:memory:` db. All the markdown files on
-disk contain the source of truth, so the application only builds this as
-a working index to ease searching and listing articles.
+```markdown
+---
+title: My Article
+description: A brief description
+date: 2024-01-15
+layout: post
+ogImage: /path/to/image.png
+---
+
+# Article Content
+
+Your markdown content here...
+```
+
+### Run
+
+```bash
+task          # Start the service
+task test     # Run tests
+task cover    # Generate coverage report
+```
+
+## API Endpoints
+
+| Method | Path                        | Response               |
+|--------|-----------------------------|------------------------|
+| GET    | `/api/blog/articles`        | JSON array of articles |
+| GET    | `/api/blog/articles/{slug}` | Single article JSON    |
+| GET    | `/api/blog/search?q=query`  | Search results         |
+| GET    | `/blog/`                    | Article list (HTML)    |
+| GET    | `/blog/{slug}`              | Article detail (HTML)  |
+
+## Architecture
+
+The module consists of:
+
+- **Module** (`blog.go`) - Lifecycle management and route registration
+- **Handlers** (`handlers.go`) - HTTP request handling
+- **Storage** (`storage/`) - Database operations
+- **Models** (`model/`) - Data types
+- **Templates** (`template/`, `theme/`) - HTML rendering
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md) - System design and patterns
+- [Implementation](docs/IMPLEMENTATION.md) - Module implementation details
+- [Setup Guide](docs/SETUP.md) - Configuration and getting started
+- [Markdown](docs/MARKDOWN.md) - Syntax highlighting and rendering
+- [Porting Guide](docs/PORTING.md) - Migration from Eleventy/WebC
+
+## Testing
+
+```bash
+task test                 # Run all tests
+task test:unit           # Unit tests only
+task test:integration    # Integration tests only
+task cover               # Generate coverage report
+task bench               # Run benchmarks
+```
+
+## Dependencies
+
+- Go 1.25.4+
+- SQLite 3.x
+- [platform](https://github.com/titpetric/platform)
+- [vuego](https://github.com/titpetric/vuego)
+- [blackfriday](https://github.com/russross/blackfriday)
+- [chroma](https://github.com/alecthomas/chroma)

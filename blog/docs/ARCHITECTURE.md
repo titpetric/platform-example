@@ -6,11 +6,13 @@ Complete overview of the blog module implementation for the platform.
 
 ```
 blog/
-├── ARCHITECTURE.md          # This file
-├── IMPLEMENTATION.md        # Implementation details
-├── SETUP.md                 # Setup and configuration
-├── PORTING.md               # WebC to VueGo migration guide
-├── README.md                # Original README
+├── README.md                # Project overview
+├── docs/
+│   ├── ARCHITECTURE.md      # This file
+│   ├── IMPLEMENTATION.md    # Implementation details
+│   ├── SETUP.md             # Setup and configuration
+│   ├── PORTING.md           # WebC to VueGo migration guide
+│   └── MARKDOWN.md          # Markdown rendering
 │
 ├── blog.go                  # Module implementation
 ├── handlers.go              # HTTP request handlers
@@ -64,10 +66,10 @@ The blog module implements the `platform.Module` interface:
 
 ```go
 type Module struct {
-    platform.UnimplementedModule
-    dataDir    string                        // Path to markdown files
-    repository *storage.Storage              // Database operations
-    articles   map[string]*model.Article     // In-memory index
+	platform.UnimplementedModule
+	dataDir    string                    // Path to markdown files
+	repository *storage.Storage          // Database operations
+	articles   map[string]*model.Article // In-memory index
 }
 
 // Implements:
@@ -89,8 +91,8 @@ HTTP request handlers:
 
 ```go
 type Handlers struct {
-    repository *storage.Storage
-    helpers    *template.TemplateHelpers
+	repository *storage.Storage
+	helpers    *template.TemplateHelpers
 }
 
 // Methods:
@@ -113,17 +115,20 @@ type Handlers struct {
 Three-layer storage abstraction:
 
 #### db.go
+
 ```go
 func DB(ctx context.Context) (*sqlx.DB, error)
-    // Gets database connection from platform.Database.Connect()
-    // Named connection: "blog"
-    // Reuses connections, no explicit close needed
+
+// Gets database connection from platform.Database.Connect()
+// Named connection: "blog"
+// Reuses connections, no explicit close needed
 ```
 
 #### storage.go
+
 ```go
 type Storage struct {
-    db *sqlx.DB
+	db *sqlx.DB
 }
 
 // Methods provide a clean interface:
@@ -136,6 +141,7 @@ type Storage struct {
 ```
 
 #### articles.go
+
 ```go
 // Package-level functions for SQL operations
 // Called by Storage methods
@@ -155,28 +161,28 @@ Data types:
 ```go
 // Article represents a blog post
 type Article struct {
-    ID          string    // Unique ID
-    Slug        string    // URL-friendly identifier
-    Title       string
-    Description string
-    Content     string    // Raw markdown
-    Date        time.Time
-    OGImage     string
-    Layout      string    // Template name
-    Source      string    // Optional external source
-    URL         string    // Generated path
-    CreatedAt   time.Time
-    UpdatedAt   time.Time
+	ID          string // Unique ID
+	Slug        string // URL-friendly identifier
+	Title       string
+	Description string
+	Content     string // Raw markdown
+	Date        time.Time
+	OGImage     string
+	Layout      string // Template name
+	Source      string // Optional external source
+	URL         string // Generated path
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 // Metadata from YAML front matter
 type Metadata struct {
-    Title       string
-    Description string
-    OGImage     string
-    Date        string
-    Layout      string
-    Source      string
+	Title       string
+	Description string
+	OGImage     string
+	Date        string
+	Layout      string
+	Source      string
 }
 ```
 
@@ -185,36 +191,41 @@ type Metadata struct {
 Four files handle template rendering:
 
 #### base.go
+
 ```go
 type BaseData struct {
-    Title, Description, OGImage string
-    Content string
-    Meta, Page interface{}
-    Classnames string
-    // Helper functions...
+	Title, Description, OGImage string
+	Content                     string
+	Meta, Page                  interface{}
+	Classnames                  string
+	// Helper functions...
 }
 
 func Base(ctx Context, data *BaseData) (string, error)
-    // Renders base.vuego layout
+
+// Renders base.vuego layout
 ```
 
 #### post.go
+
 ```go
 type PostData struct {
-    Title, Description string
-    Content string
-    Date time.Time
-    // Helper functions for formatting...
+	Title, Description string
+	Content            string
+	Date               time.Time
+	// Helper functions for formatting...
 }
 
 func Post(ctx Context, data *PostData) (string, error)
-    // Renders post.vuego layout
+
+// Renders post.vuego layout
 ```
 
 #### component.go
+
 ```go
 type Component interface {
-    Render(ctx Context, w io.Writer) error
+	Render(ctx Context, w io.Writer) error
 }
 
 // Implementations:
@@ -223,17 +234,19 @@ type Component interface {
 ```
 
 #### helpers.go
+
 ```go
 type TemplateHelpers struct {
-    Meta, Page interface{}
-    MetaTitle func(string) string
-    PostDate func(time.Time) string
-    ReadingTime func(string) string
-    // More helpers...
+	Meta, Page  interface{}
+	MetaTitle   func(string) string
+	PostDate    func(time.Time) string
+	ReadingTime func(string) string
+	// More helpers...
 }
 
 func DefaultHelpers(meta, page interface{}) *TemplateHelpers
-    // Provides sensible defaults
+
+// Provides sensible defaults
 ```
 
 ## Data Flow
@@ -348,13 +361,13 @@ func NewStorage(db *sqlx.DB)
 
 Clear boundaries:
 
-| Layer | Responsibility | Can Access |
-|-------|---|---|
-| Module | Lifecycle | Router, Platform |
-| Handlers | HTTP | Storage, Templates |
-| Storage | SQL | Database |
-| Templates | Rendering | Helper functions |
-| Models | Data types | (Nothing - plain structs) |
+| Layer     | Responsibility | Can Access                |
+|-----------|----------------|---------------------------|
+| Module    | Lifecycle      | Router, Platform          |
+| Handlers  | HTTP           | Storage, Templates        |
+| Storage   | SQL            | Database                  |
+| Templates | Rendering      | Helper functions          |
+| Models    | Data types     | (Nothing - plain structs) |
 
 ### 4. Context Flow
 
@@ -383,13 +396,13 @@ Errors propagate up:
 
 ### Routes
 
-| Method | Path | Response | Cache |
-|--------|------|----------|-------|
-| GET | /api/blog/articles | JSON | 5min |
-| GET | /api/blog/articles/{slug} | JSON | 1hr |
-| GET | /api/blog/search?q=X | JSON | 5min |
-| GET | /blog/ | HTML | 5min |
-| GET | /blog/{slug} | HTML | 1hr |
+| Method | Path                      | Response | Cache |
+|--------|---------------------------|----------|-------|
+| GET    | /api/blog/articles        | JSON     | 5min  |
+| GET    | /api/blog/articles/{slug} | JSON     | 1hr   |
+| GET    | /api/blog/search?q=X      | JSON     | 5min  |
+| GET    | /blog/                    | HTML     | 5min  |
+| GET    | /blog/{slug}              | HTML     | 1hr   |
 
 ### Content Negotiation
 
@@ -452,7 +465,8 @@ All models use:
 - Markdown parsing and front matter extraction
 
 ### Examples
-See SETUP.md for testing code samples.
+
+See docs/SETUP.md for testing code samples.
 
 ## Future Extensions
 

@@ -24,7 +24,7 @@ The blog module auto-registers via `init()` function in blog.go:
 
 ```go
 func init() {
-    platform.Register(NewModule("./data"))
+	platform.Register(NewModule("./data"))
 }
 ```
 
@@ -55,7 +55,7 @@ export PLATFORM_DB_BLOG="mysql://user:pass@localhost/blog_db"
 By default, the module scans `./data` for markdown files:
 
 ```go
-NewModule("./data")  // Scans ./data directory
+NewModule("./data") // Scans ./data directory
 ```
 
 Create your data directory:
@@ -71,6 +71,7 @@ mkdir -p ./data
 Create files in the `data/` directory with `.md` extension:
 
 **data/my-first-article.md:**
+
 ```markdown
 ---
 title: My First Article
@@ -91,14 +92,14 @@ This is the article content. It supports **markdown** formatting.
 
 ### Front Matter Fields
 
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| title | string | Yes | Article title |
-| description | string | No | Meta description |
-| date | string | No | Format: YYYY-MM-DD |
-| layout | string | No | Template layout (default: "post") |
-| ogImage | string | No | Open Graph image URL |
-| source | string | No | External source/attribution |
+| Field       | Type   | Required | Notes                             |
+|-------------|--------|----------|-----------------------------------|
+| title       | string | Yes      | Article title                     |
+| description | string | No       | Meta description                  |
+| date        | string | No       | Format: YYYY-MM-DD                |
+| layout      | string | No       | Template layout (default: "post") |
+| ogImage     | string | No       | Open Graph image URL              |
+| source      | string | No       | External source/attribution       |
 
 ### File Naming
 
@@ -185,22 +186,22 @@ Test storage operations:
 
 ```go
 func TestGetArticleBySlug(t *testing.T) {
-    ctx := context.Background()
-    db, _ := sqlx.Open("sqlite3", ":memory:")
-    defer db.Close()
-    
-    storage := storage.NewStorage(db)
-    storage.InitSchema(ctx)
-    
-    article := &model.Article{
-        ID:    "test-1",
-        Slug:  "test",
-        Title: "Test Article",
-    }
-    storage.InsertArticle(ctx, article)
-    
-    retrieved, _ := storage.GetArticleBySlug(ctx, "test")
-    assert.Equal(t, "Test Article", retrieved.Title)
+	ctx := context.Background()
+	db, _ := sqlx.Open("sqlite3", ":memory:")
+	defer db.Close()
+
+	storage := storage.NewStorage(db)
+	storage.InitSchema(ctx)
+
+	article := &model.Article{
+		ID:    "test-1",
+		Slug:  "test",
+		Title: "Test Article",
+	}
+	storage.InsertArticle(ctx, article)
+
+	retrieved, _ := storage.GetArticleBySlug(ctx, "test")
+	assert.Equal(t, "Test Article", retrieved.Title)
 }
 ```
 
@@ -210,19 +211,19 @@ Test with platform:
 
 ```go
 func TestBlogModule(t *testing.T) {
-    opts := platform.NewTestOptions()
-    plat := platform.New(opts)
-    
-    m := NewModule("./testdata")
-    plat.Register(m)
-    
-    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-    defer cancel()
-    
-    plat.Start(ctx)
-    defer plat.Stop(context.Background())
-    
-    // Test handlers here
+	opts := platform.NewTestOptions()
+	plat := platform.New(opts)
+
+	m := NewModule("./testdata")
+	plat.Register(m)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	plat.Start(ctx)
+	defer plat.Stop(context.Background())
+
+	// Test handlers here
 }
 ```
 
@@ -273,8 +274,8 @@ echo $PLATFORM_DB_BLOG
 HTML responses include cache headers:
 
 ```go
-w.Header().Set("Cache-Control", "public, max-age=3600")  // Articles: 1 hour
-w.Header().Set("Cache-Control", "public, max-age=300")   // Search: 5 minutes
+w.Header().Set("Cache-Control", "public, max-age=3600") // Articles: 1 hour
+w.Header().Set("Cache-Control", "public, max-age=300")  // Search: 5 minutes
 ```
 
 ### Database Indexes

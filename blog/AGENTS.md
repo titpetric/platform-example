@@ -13,21 +13,25 @@ go install github.com/go-task/task/v3/cmd/task@latest
 ### Common Commands
 
 **Run the service:**
+
 ```bash
 task          # Start blog service on http://127.0.0.1:8080
 ```
 
 **Format code:**
+
 ```bash
 task fmt
 ```
 
 **Run all checks (lint, test, build):**
+
 ```bash
 task all
 ```
 
 **Run tests:**
+
 ```bash
 task test          # All tests
 task test:unit     # Unit tests only
@@ -36,11 +40,13 @@ task test:coverage # Tests with coverage report
 ```
 
 **Build:**
+
 ```bash
 task build
 ```
 
 **Run benchmarks:**
+
 ```bash
 task bench         # Standard benchmarks
 task bench:cpu     # With CPU profiling
@@ -48,17 +54,20 @@ task bench:memory  # With memory profiling
 ```
 
 **Lint and vet:**
+
 ```bash
 task lint
 task vet
 ```
 
 **Clean:**
+
 ```bash
 task clean         # Remove build artifacts
 ```
 
 **CI pipeline:**
+
 ```bash
 task ci            # Runs: fmt:check, lint, vet, test, coverage:check
 ```
@@ -141,12 +150,14 @@ blog/
 ### Go Modules
 
 Update dependencies with:
+
 ```bash
 go get -u ./...
 go mod tidy
 ```
 
 Check for updates:
+
 ```bash
 task deps
 ```
@@ -173,9 +184,10 @@ task deps
 ### Storage Operations
 
 All storage methods follow this pattern:
+
 ```go
 func (s *Storage) GetArticleBySlug(ctx context.Context, slug string) (*model.Article, error) {
-    return GetArticleBySlug(ctx, s.db, slug)
+	return GetArticleBySlug(ctx, s.db, slug)
 }
 ```
 
@@ -209,6 +221,7 @@ The `task ci` command runs:
 ### Database Issues
 
 Check SQLite directly:
+
 ```bash
 sqlite3 :memory: "SELECT COUNT(*) FROM articles;"
 ```
@@ -216,6 +229,7 @@ sqlite3 :memory: "SELECT COUNT(*) FROM articles;"
 ### Test Failures
 
 Run specific test with verbose output:
+
 ```bash
 go test -v -run TestName ./storage
 ```
@@ -223,6 +237,7 @@ go test -v -run TestName ./storage
 ### Performance
 
 Profile a benchmark:
+
 ```bash
 task bench:cpu
 task bench:memory

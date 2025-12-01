@@ -9,9 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/titpetric/platform"
-	"gopkg.in/yaml.v3"
 	_ "modernc.org/sqlite"
+
+	"github.com/titpetric/platform"
+	yaml "gopkg.in/yaml.v3"
 
 	"github.com/titpetric/platform-example/blog/model"
 	"github.com/titpetric/platform-example/blog/storage"
@@ -53,13 +54,13 @@ func (m *Module) Mount(_ context.Context, router platform.Router) error {
 	}
 
 	// Static files
-	assetFS := http.FileServer(http.Dir("theme/assets"))
-	router.Get("/css/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
-	router.Get("/fonts/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
-	router.Get("/icons/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
-	router.Get("/favicon/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
-	router.Get("/robots.txt", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
-	router.Get("/site.webmanifest", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+	assetFS := http.StripPrefix("/assets", http.FileServer(http.Dir("theme/assets")))
+	router.Get("/assets/css/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+	router.Get("/assets/fonts/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+	router.Get("/assets/icons/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+	router.Get("/assets/favicon/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+	router.Get("/assets/robots.txt", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
+	router.Get("/assets/site.webmanifest", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })
 
 	// API Routes (JSON)
 	router.Get("/api/blog/articles", h.ListArticlesJSON)
@@ -116,6 +117,17 @@ func (m *Module) Start(ctx context.Context) error {
 func (m *Module) Stop(context.Context) error {
 	// Nothing to clean up - database is managed by platform
 	return nil
+}
+
+// SetRepository sets the repository on the module
+func (m *Module) SetRepository(repo *storage.Storage) {
+	m.repository = repo
+}
+
+// ScanMarkdownFiles scans the data directory for markdown files and indexes them
+// Returns the count of scanned files
+func (m *Module) ScanMarkdownFiles(ctx context.Context) (int, error) {
+	return m.scanMarkdownFiles(ctx)
 }
 
 // scanMarkdownFiles scans the data directory for markdown files and indexes them

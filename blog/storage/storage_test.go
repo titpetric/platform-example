@@ -5,8 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	_ "modernc.org/sqlite"
+
+	"github.com/jmoiron/sqlx"
 
 	"github.com/titpetric/platform-example/blog/model"
 	"github.com/titpetric/platform-example/blog/schema"

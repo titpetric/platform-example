@@ -6,11 +6,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/alecthomas/chroma/v2"
+	chroma "github.com/alecthomas/chroma/v2"
 	"github.com/alecthomas/chroma/v2/formatters/html"
 	"github.com/alecthomas/chroma/v2/lexers"
 	"github.com/alecthomas/chroma/v2/styles"
-	"github.com/russross/blackfriday/v2"
+	blackfriday "github.com/russross/blackfriday/v2"
 )
 
 // Renderer renders markdown content to HTML with syntax highlighting

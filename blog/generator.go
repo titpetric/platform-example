@@ -1,0 +1,262 @@
+package blog
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/titpetric/platform-example/blog/markdown"
+	"github.com/titpetric/platform-example/blog/template"
+)
+
+// Generator generates static HTML files from blog content
+type Generator struct {
+	module    *Module
+	outputDir string
+}
+
+// NewGenerator creates a new Generator instance
+func NewGenerator(m *Module, outputDir string) *Generator {
+	return &Generator{
+		module:    m,
+		outputDir: outputDir,
+	}
+}
+
+// Generate generates all static HTML files
+func (g *Generator) Generate(ctx context.Context) error {
+	// Ensure output directory exists
+	if err := os.MkdirAll(g.outputDir, 0o755); err != nil {
+		return fmt.Errorf("failed to create output directory: %w", err)
+	}
+
+	// Copy static assets
+	fmt.Println("Copying assets...")
+	if err := g.copyAssets(); err != nil {
+		return fmt.Errorf("failed to copy assets: %w", err)
+	}
+
+	// Create handlers for rendering
+	h, err := NewHandlers(g.module.repository)
+	if err != nil {
+		return fmt.Errorf("failed to create handlers: %w", err)
+	}
+
+	// Generate index page
+	fmt.Println("Generating index.html...")
+	if err := g.generateIndexPage(ctx, h); err != nil {
+		return fmt.Errorf("failed to generate index page: %w", err)
+	}
+
+	// Generate other pages (404, resume, etc.)
+	fmt.Println("Generating static pages...")
+	if err := g.generateStaticPages(ctx, h); err != nil {
+		return fmt.Errorf("failed to generate static pages: %w", err)
+	}
+
+	// Generate individual article pages
+	articles, err := g.module.repository.GetArticles(ctx, 0, 9999)
+	if err != nil {
+		return fmt.Errorf("failed to fetch articles: %w", err)
+	}
+
+	mdRenderer := markdown.NewRenderer()
+	for _, modelArticle := range articles {
+		fmt.Printf("Generating blog/%s/index.html...\n", modelArticle.Slug)
+
+		// Convert markdown to HTML
+		contentWithoutFrontMatter := template.StripFrontMatter(modelArticle.Content)
+		htmlContent := mdRenderer.Render([]byte(contentWithoutFrontMatter))
+
+		// Create PostData
+		postData := h.views.PostFromArticle(&modelArticle, string(htmlContent))
+
+		if err := g.generateArticlePage(ctx, h, postData); err != nil {
+			return fmt.Errorf("failed to generate article page for %s: %w", modelArticle.Slug, err)
+		}
+	}
+
+	// Generate feed.xml
+	fmt.Println("Generating feed.xml...")
+	if err := g.generateFeed(ctx, h); err != nil {
+		return fmt.Errorf("failed to generate feed: %w", err)
+	}
+
+	fmt.Printf("✓ Generated %d articles\n", len(articles))
+	return nil
+}
+
+// generateIndexPage generates the index.html file
+func (g *Generator) generateIndexPage(ctx context.Context, h *Handlers) error {
+	articles, err := h.repository.GetArticles(ctx, 0, 5)
+	if err != nil {
+		return err
+	}
+
+	indexData := h.views.IndexFromArticles(articles)
+	html, err := h.views.Index(ctx, indexData)
+	if err != nil {
+		return err
+	}
+
+	indexPath := filepath.Join(g.outputDir, "index.html")
+	return os.WriteFile(indexPath, []byte(html), 0o644)
+}
+
+// generateStaticPages generates all .vuego pages from theme/pages directory recursively
+func (g *Generator) generateStaticPages(ctx context.Context, h *Handlers) error {
+	pagesDir := filepath.Join("theme", "pages")
+	return g.walkPages(ctx, h, pagesDir, "")
+}
+
+func (g *Generator) walkPages(ctx context.Context, h *Handlers, dirPath string, relPath string) error {
+	entries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return fmt.Errorf("failed to read pages directory %s: %w", dirPath, err)
+	}
+
+	for _, entry := range entries {
+		entryPath := filepath.Join(dirPath, entry.Name())
+		entryRelPath := filepath.Join(relPath, entry.Name())
+
+		if entry.IsDir() {
+			// Recursively walk subdirectories
+			if err := g.walkPages(ctx, h, entryPath, entryRelPath); err != nil {
+				return err
+			}
+			continue
+		}
+
+		if !strings.HasSuffix(entry.Name(), ".vuego") {
+			continue
+		}
+
+		// Skip index.vuego in root pages (handled separately)
+		if entry.Name() == "index.vuego" && relPath == "" {
+			continue
+		}
+
+		pageName := strings.TrimSuffix(entry.Name(), ".vuego")
+		templatePath := filepath.Join("pages", entryRelPath)
+
+		// Determine output path and prepare data
+		var outputPath string
+		var templateData map[string]interface{}
+
+		if entry.Name() == "index.vuego" {
+			// index.vuego in subdirectories becomes subdir/index.html
+			parentDir := strings.TrimSuffix(entryRelPath, "/index.vuego")
+			outputDir := filepath.Join(g.outputDir, parentDir)
+			if err := os.MkdirAll(outputDir, 0o755); err != nil {
+				return err
+			}
+			outputPath = filepath.Join(outputDir, "index.html")
+
+			// Special handling for blog/index.vuego
+			if parentDir == "blog" {
+				articles, err := h.repository.GetArticles(ctx, 0, 9999)
+				if err != nil {
+					return fmt.Errorf("failed to fetch articles for blog page: %w", err)
+				}
+				templateData = map[string]interface{}{
+					"articles": articles,
+					"total":    len(articles),
+				}
+			} else {
+				templateData = map[string]interface{}{}
+			}
+		} else {
+			// Regular pages become page-name.html
+			outputPath = filepath.Join(g.outputDir, pageName+".html")
+			templateData = map[string]interface{}{}
+		}
+
+		// Render the page
+		html, err := h.views.RenderPage(ctx, templatePath, templateData)
+		if err != nil {
+			return fmt.Errorf("failed to render page %s: %w", templatePath, err)
+		}
+
+		// Write the file
+		if err := os.WriteFile(outputPath, []byte(html), 0o644); err != nil {
+			return fmt.Errorf("failed to write page %s: %w", outputPath, err)
+		}
+
+		fmt.Printf("Generated %s\n", outputPath)
+	}
+
+	return nil
+}
+
+// generateArticlePage generates an individual article page
+func (g *Generator) generateArticlePage(ctx context.Context, h *Handlers, postData *template.PostData) error {
+	html, err := h.views.Post(ctx, postData)
+	if err != nil {
+		return err
+	}
+
+	articleDir := filepath.Join(g.outputDir, "blog", postData.Slug)
+	if err := os.MkdirAll(articleDir, 0o755); err != nil {
+		return err
+	}
+
+	articlePath := filepath.Join(articleDir, "index.html")
+	return os.WriteFile(articlePath, []byte(html), 0o644)
+}
+
+// generateFeed generates the feed.xml file
+func (g *Generator) generateFeed(ctx context.Context, h *Handlers) error {
+	articles, err := h.repository.GetArticles(ctx, 0, 20)
+	if err != nil {
+		return err
+	}
+
+	xml, err := h.views.AtomFeed(ctx, articles)
+	if err != nil {
+		return err
+	}
+
+	feedPath := filepath.Join(g.outputDir, "feed.xml")
+	return os.WriteFile(feedPath, []byte(xml), 0o644)
+}
+
+// copyAssets copies static assets from theme/assets to output directory
+func (g *Generator) copyAssets() error {
+	assetsSrcDir := filepath.Join("theme", "assets")
+	assetsDestDir := filepath.Join(g.outputDir, "assets")
+
+	// Check if source exists
+	if _, err := os.Stat(assetsSrcDir); os.IsNotExist(err) {
+		// Assets directory doesn't exist, skip
+		return nil
+	}
+
+	// Copy the entire assets directory
+	return filepath.Walk(assetsSrcDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Get relative path
+		relPath, err := filepath.Rel(assetsSrcDir, path)
+		if err != nil {
+			return err
+		}
+
+		destPath := filepath.Join(assetsDestDir, relPath)
+
+		if info.IsDir() {
+			return os.MkdirAll(destPath, 0o755)
+		}
+
+		// Copy file
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+
+		return os.WriteFile(destPath, data, 0o644)
+	})
+}

@@ -79,25 +79,3 @@ func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string,
 func escapeXML(s any) string {
 	return html.EscapeString(s.(string))
 }
-
-// stringReplace is a simple string replacement helper
-func stringReplace(s, old, new string) string {
-	result := ""
-	i := 0
-	for i < len(s) {
-		idx := -1
-		for j := i; j <= len(s)-len(old); j++ {
-			if s[j:j+len(old)] == old {
-				idx = j
-				break
-			}
-		}
-		if idx == -1 {
-			result += s[i:]
-			break
-		}
-		result += s[i:idx] + new
-		i = idx + len(old)
-	}
-	return result
-}

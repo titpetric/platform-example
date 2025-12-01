@@ -1,81 +1,78 @@
 package template
 
 import (
-	"encoding/json"
+	"bytes"
+	"context"
 	"fmt"
 	"io/fs"
-	"strings"
-	"time"
 
 	"github.com/titpetric/vuego"
 )
 
 type Views struct {
-	vue  *vuego.Vue
+	root fs.FS
 	data map[string]any
 }
 
 func NewViews(root fs.FS) (*Views, error) {
-	vue := vuego.NewVue(root)
-	vue.RegisterNodeProcessor(vuego.NewLessProcessor(root))
-
-	funcMap := vue.DefaultFuncMap()
-	funcMap["postDate"] = func(v any) any {
-		layoutStr := "2006/01/02 15:04"
-
-		switch t := v.(type) {
-		case time.Time:
-			return t.Format(layoutStr)
-		case string:
-			// Try to parse as RFC3339 or Unix timestamp
-			if parsed, err := time.Parse(time.RFC3339, t); err == nil {
-				return parsed.Format(layoutStr)
-			}
-		}
-		return v
-	}
-	funcMap["readingTime"] = func(content string) string {
-		// average reading speed ~200 words/minute
-		words := len(strings.Fields(content))
-		minutes := words / 200
-		if words%200 != 0 {
-			minutes++
-		}
-
-		if minutes <= 2 {
-			return "a few minutes"
-		}
-		return fmt.Sprintf("%d minutes", minutes)
-	}
-
-	funcMap["metaTitle"] = func(title string) string {
-		return title
-	}
-	funcMap["metaDescription"] = func(description string) string {
-		return description
-	}
-	funcMap["metaOGImage"] = func(in string) string {
-		return in
-	}
-	funcMap["getCss"] = func(string) string {
-		return ""
-	}
-	funcMap["getJs"] = func(string) string {
-		return ""
-	}
-	funcMap["json"] = func(in any) (string, error) {
-		b, err := json.MarshalIndent(in, "", "  ")
-		return string(b), err
-	}
-	vue.Funcs(funcMap)
-
 	data := map[string]any{}
 	if err := fillTemplateData(&data); err != nil {
 		return nil, err
 	}
 
 	return &Views{
-		vue:  vue,
+		root: root,
 		data: data,
 	}, nil
+}
+
+// LoadTemplate loads a template from the filesystem with LESS processor and default funcmap
+func (v *Views) LoadTemplate(filename string) (vuego.Template, error) {
+	tpl, err := vuego.Load(v.root, filename, vuego.WithLessProcessor())
+	if err != nil {
+		return nil, err
+	}
+	return tpl.Funcs(Funcs), nil
+}
+
+// RenderPage loads a page template, renders it, builds data with "content" key, and calls RenderLayout
+func (v *Views) RenderPage(ctx context.Context, pagePath string, templateData map[string]interface{}) (string, error) {
+	// Load the page template
+	tpl, err := v.LoadTemplate(pagePath)
+	if err != nil {
+		return "", err
+	}
+
+	// Render the page template
+	var pageBuf bytes.Buffer
+	if err := tpl.Fill(templateData).Render(ctx, &pageBuf); err != nil {
+		return "", err
+	}
+
+	templateData["content"] = pageBuf.String()
+
+	// Get layout name from template metadata
+	layoutName := "layouts/base.vuego"
+	if layout := tpl.GetString("layout"); layout != "" {
+		layoutName = fmt.Sprintf("layouts/%s.vuego", layout)
+	}
+
+	// Render with layout
+	return v.RenderLayout(ctx, layoutName, templateData)
+}
+
+// RenderLayout renders the page content within a specified layout using the provided data map
+func (v *Views) RenderLayout(ctx context.Context, layoutPath string, data map[string]any) (string, error) {
+	// Load the layout template
+	layout, err := v.LoadTemplate(layoutPath)
+	if err != nil {
+		return "", err
+	}
+
+	// Render the layout with provided data
+	var layoutBuf bytes.Buffer
+	if err := layout.Fill(data).Render(ctx, &layoutBuf); err != nil {
+		return "", err
+	}
+	return layoutBuf.String(), nil
 }

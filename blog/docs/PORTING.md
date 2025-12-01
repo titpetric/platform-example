@@ -47,38 +47,44 @@ blog/
 
 ### Syntax Changes
 
-| webc | vuego |
-|------|-------|
-| `{{ value }}` | `{{ value }}` |
-| `:attr="value"` | `:attr="value"` |
-| `@text="value"` | `{{ value }}` |
-| `@raw="value"` | `v-html="value"` |
-| `v-if` | `v-if` |
+| webc                    | vuego                   |
+|-------------------------|-------------------------|
+| `{{ value }}`           | `{{ value }}`           |
+| `:attr="value"`         | `:attr="value"`         |
+| `@text="value"`         | `{{ value }}`           |
+| `@raw="value"`          | `v-html="value"`        |
+| `v-if`                  | `v-if`                  |
 | `v-for="item of items"` | `v-for="item of items"` |
-| `webc:if` | `v-if` |
-| `webc:for` | `v-for` |
-| `webc:nokeep` | (removed) |
-| `webc:root="override"` | (removed) |
-| `webc:setup` | (removed - use props) |
+| `webc:if`               | `v-if`                  |
+| `webc:for`              | `v-for`                 |
+| `webc:nokeep`           | (removed)               |
+| `webc:root="override"`  | (removed)               |
+| `webc:setup`            | (removed - use props)   |
 
 ### Example Conversions
 
 **base.webc → base.vuego:**
+
 ```webc
 <title @text="metaTitle(title)"></title>
 ```
+
 becomes:
+
 ```vuego
 <title>{{ metaTitle(title) }}</title>
 ```
 
 **site-header.webc → site-header.vuego:**
+
 ```webc
 <li webc:if="index < 3" webc:for="(item, index) of menu">
   <a :href="item.url" @text="item.label"></a>
 </li>
 ```
+
 becomes:
+
 ```vuego
 <li v-for="(item, index) of navigation.menu" v-if="index < 3">
   <a :href="item.url">{{ item.label }}</a>
@@ -93,9 +99,9 @@ The blog module implements the `platform.Module` interface:
 
 ```go
 type Module struct {
-    db       *sql.DB
-    dataDir  string
-    articles map[string]*model.Article
+	db       *sql.DB
+	dataDir  string
+	articles map[string]*model.Article
 }
 ```
 
@@ -123,6 +129,7 @@ type Module struct {
 Each markdown file in the `data/` directory is processed as follows:
 
 1. **YAML Front Matter Extraction**
+
    ```yaml
    ---
    title: Article Title
@@ -151,33 +158,35 @@ SQLite `:memory:` database with:
 ## Model Types
 
 ### Article
+
 ```go
 type Article struct {
-    ID          string    // Unique identifier
-    Slug        string    // URL-friendly identifier
-    Title       string
-    Description string
-    Content     string    // Raw markdown content
-    Date        time.Time
-    OGImage     string
-    Layout      string    // Template layout name
-    Source      string    // External source if applicable
-    ReadingTime string    // Calculated reading time
-    URL         string    // Full article URL
-    CreatedAt   time.Time
-    UpdatedAt   time.Time
+	ID          string // Unique identifier
+	Slug        string // URL-friendly identifier
+	Title       string
+	Description string
+	Content     string // Raw markdown content
+	Date        time.Time
+	OGImage     string
+	Layout      string // Template layout name
+	Source      string // External source if applicable
+	ReadingTime string // Calculated reading time
+	URL         string // Full article URL
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 ```
 
 ### Metadata
+
 ```go
 type Metadata struct {
-    Title       string
-    Description string
-    OGImage     string
-    Date        string
-    Layout      string
-    Source      string
+	Title       string
+	Description string
+	OGImage     string
+	Date        string
+	Layout      string
+	Source      string
 }
 ```
 
@@ -187,7 +196,7 @@ The module is registered in the `init()` function:
 
 ```go
 func init() {
-    platform.Register(NewModule("./data"))
+	platform.Register(NewModule("./data"))
 }
 ```
 
@@ -196,21 +205,27 @@ This allows automatic discovery and registration with the platform.
 ## API Endpoints
 
 ### List Articles
+
 ```
 GET /api/blog/articles
 ```
+
 Returns JSON array of articles sorted by date (newest first).
 
 ### Get Article
+
 ```
 GET /api/blog/articles/{slug}
 ```
+
 Returns full article JSON including content.
 
 ### Search Articles
+
 ```
 GET /api/blog/search?q=query
 ```
+
 Returns matching articles based on title, description, or slug.
 
 ## Template Variables
@@ -226,15 +241,15 @@ When rendering templates, the following variables are available:
 
 ## Migration Checklist
 
-- [x] Port all .webc layout files to .vuego
-- [x] Port all .webc component files to .vuego
-- [x] Port all .webc page files to .vuego
-- [x] Create Go model package with Article types
-- [x] Create SQLite schema
-- [x] Implement blog.go module
-- [x] Implement Mount() for route registration
-- [x] Implement Start() for markdown scanning and indexing
-- [x] Implement Stop() for graceful shutdown
+- [X] Port all .webc layout files to .vuego
+- [X] Port all .webc component files to .vuego
+- [X] Port all .webc page files to .vuego
+- [X] Create Go model package with Article types
+- [X] Create SQLite schema
+- [X] Implement blog.go module
+- [X] Implement Mount() for route registration
+- [X] Implement Start() for markdown scanning and indexing
+- [X] Implement Stop() for graceful shutdown
 - [ ] Implement HTML template rendering with vuego
 - [ ] Add content markdown rendering (HTML conversion)
 - [ ] Add reading time calculation

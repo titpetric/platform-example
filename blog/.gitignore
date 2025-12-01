@@ -1,2 +1,7 @@
 /blog
 /blog.db
+/public
+/*.cov
+/*.json
+/*.test
+/*.out

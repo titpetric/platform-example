@@ -47,7 +47,7 @@ Any language supported by Chroma lexers is automatically highlighted. Common lan
 
 Specify language for better highlighting:
 
-````markdown
+```markdown
 ```go
 package main
 
@@ -55,7 +55,8 @@ func main() {
     fmt.Println("Hello, World!")
 }
 ```
-````
+
+```
 
 ### Indented Code Blocks
 

@@ -1,6 +1,0 @@
----
-layout: "base"
----
-
-<h1>Blog</h1>
-<article-list :articles="articles" :count="10"></article-list>

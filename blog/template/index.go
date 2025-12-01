@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/titpetric/platform-example/blog/model"
 )
@@ -20,39 +19,29 @@ type IndexData struct {
 	Total       int             `json:"total"`
 }
 
+// Map converts IndexData to a map[string]any
+func (d *IndexData) Map() map[string]any {
+	return map[string]any{
+		"title":       d.Title,
+		"description": d.Description,
+		"ogImage":     d.OGImage,
+		"articles":    d.Articles,
+		"total":       d.Total,
+	}
+}
+
 // Index renders the blog index/list page
 func (v *Views) Index(ctx context.Context, data *IndexData) (string, error) {
-	var vue = v.vue
-
 	// Build the context data
-	templateData := map[string]interface{}{
-		"title":       data.Title,
-		"description": data.Description,
-		"ogImage":     data.OGImage,
-		"articles":    data.Articles,
-		"total":       data.Total,
-	}
+	templateData := data.Map()
 	for k, v := range v.data {
 		if _, ok := templateData[k]; !ok {
 			templateData[k] = v
 		}
 	}
 
-	// First, render the index content as a fragment
-	var fragmentBuf strings.Builder
-	if err := vue.RenderFragment(&fragmentBuf, "pages/index.vuego", templateData); err != nil {
-		return "", err
-	}
-
-	// Pass the rendered content to the base layout
-	templateData["content"] = fragmentBuf.String()
-
-	var layoutBuf strings.Builder
-	// Re-apply funcMap before rendering base layout
-	if err := vue.Render(&layoutBuf, "layouts/base.vuego", templateData); err != nil {
-		return "", err
-	}
-	return layoutBuf.String(), nil
+	// Render the index page
+	return v.RenderPage(ctx, "pages/index.vuego", templateData)
 }
 
 func fillTemplateData(w *map[string]any) error {
@@ -82,6 +71,20 @@ func loadFile(w *map[string]any, key string, filename string) error {
 	(*w)[key] = result
 	log.Println("loaded ok:", key, filename)
 	return nil
+}
+
+// Blog renders the blog list page
+func (v *Views) Blog(ctx context.Context, data *IndexData) (string, error) {
+	// Build the context data
+	templateData := data.Map()
+	for k, v := range v.data {
+		if _, ok := templateData[k]; !ok {
+			templateData[k] = v
+		}
+	}
+
+	// Render the blog page
+	return v.RenderPage(ctx, "pages/blog.vuego", templateData)
 }
 
 // IndexFromArticles creates IndexData from a list of articles

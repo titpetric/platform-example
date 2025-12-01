@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/go-chi/chi/v5/middleware"
-
 	"github.com/titpetric/platform"
+
 	"github.com/titpetric/platform-example/blog"
 )
 

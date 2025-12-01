@@ -8,8 +8,18 @@ The blog module follows the platform architecture with clear separation of conce
 
 ```
 blog/
+├── README.md            # Project overview
+├── Taskfile.yaml        # Build automation
 ├── blog.go              # Module implementation (lifecycle)
 ├── handlers.go          # HTTP handlers
+├── docs/                # Documentation
+│   ├── ARCHITECTURE.md
+│   ├── IMPLEMENTATION.md
+│   ├── SETUP.md
+│   ├── PORTING.md
+│   ├── MARKDOWN.md
+│   ├── api.md           # Generated API docs
+│   └── testing-coverage.md  # Generated coverage report
 ├── template/
 │   ├── base.go         # Base layout template
 │   ├── post.go         # Post layout template
@@ -19,6 +29,8 @@ blog/
 │   ├── db.go           # Database connection via platform.Database
 │   ├── storage.go      # Storage interface
 │   └── articles.go     # Article operations
+├── markdown/
+│   └── markdown.go     # Markdown rendering with syntax highlighting
 ├── model/
 │   └── article.go      # Article data models
 ├── schema/
@@ -33,7 +45,7 @@ The blog module uses `platform.Database.Connect()` to get a database connection:
 ```go
 // In storage/db.go
 func DB(ctx context.Context) (*sqlx.DB, error) {
-    return platform.Database.Connect(ctx, "blog")
+	return platform.Database.Connect(ctx, "blog")
 }
 ```
 
@@ -54,6 +66,7 @@ This pattern:
 6. Indexes articles in both memory map and database
 
 ### Mount()
+
 Registers HTTP routes after Start() completes:
 
 **JSON API Routes:**
@@ -66,6 +79,7 @@ Registers HTTP routes after Start() completes:
 - `GET /blog/{slug}` - Article detail (HTML)
 
 ### Stop()
+
 No explicit cleanup needed - platform manages database lifecycle.
 
 ## Handlers
@@ -74,8 +88,8 @@ The `Handlers` struct manages HTTP request handling:
 
 ```go
 type Handlers struct {
-    repository *storage.Storage
-    helpers    *template.TemplateHelpers
+	repository *storage.Storage
+	helpers    *template.TemplateHelpers
 }
 ```
 
@@ -97,7 +111,7 @@ The `Storage` struct provides an interface to database operations:
 
 ```go
 type Storage struct {
-    db *sqlx.DB
+	db *sqlx.DB
 }
 
 // Methods:
@@ -202,23 +216,24 @@ PLATFORM_DB_BLOG="sqlite://:memory:"
 ```go
 // In main application setup
 func init() {
-    // Module auto-registers via platform.Register()
+	// Module auto-registers via platform.Register()
 }
 
 func main() {
-    ctx := context.Background()
-    
-    // Platform automatically calls:
-    // 1. m.Start(ctx) - Initialize module
-    // 2. m.Mount(router) - Register routes
-    
-    platform.Start(ctx)
+	ctx := context.Background()
+
+	// Platform automatically calls:
+	// 1. m.Start(ctx) - Initialize module
+	// 2. m.Mount(router) - Register routes
+
+	platform.Start(ctx)
 }
 ```
 
 ## API Endpoints
 
 ### List Articles
+
 ```
 GET /api/blog/articles
 Content-Type: application/json
@@ -242,6 +257,7 @@ Response:
 ```
 
 ### Get Article
+
 ```
 GET /api/blog/articles/{slug}
 Content-Type: application/json
@@ -260,6 +276,7 @@ Response:
 ```
 
 ### Search Articles
+
 ```
 GET /api/blog/search?q=keyword
 Content-Type: application/json
@@ -273,6 +290,7 @@ Response:
 ```
 
 ### HTML Routes
+
 ```
 GET /blog/                  # Article list page
 GET /blog/my-article/       # Article detail page

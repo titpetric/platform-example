@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-chi/chi/v5"
+	chi "github.com/go-chi/chi/v5"
 
 	"github.com/titpetric/platform-example/blog/markdown"
 	"github.com/titpetric/platform-example/blog/model"
@@ -136,9 +136,9 @@ func (h *Handlers) ListArticlesHTML(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=300")
 
-	// Create index component to render list
-	indexData := h.views.IndexFromArticles(articles)
-	html, err := h.views.Index(r.Context(), indexData)
+	// Create blog list and render
+	blogData := h.views.IndexFromArticles(articles)
+	html, err := h.views.Blog(r.Context(), blogData)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("render failed: %v", err), http.StatusInternalServerError)
 		return

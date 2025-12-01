@@ -1,7 +1,13 @@
-version: '3'
+version: "3"
+
+includes:
+  mdox: ./Taskfile.mdox.yml
 
 vars:
-  COVERAGE_MIN: '70'
+  COVERAGE_MIN: "70"
+  goversion:
+    sh: go env GOVERSION
+  toolchain: '{{.goversion}}+auto'
 
 tasks:
   default:
@@ -9,26 +15,35 @@ tasks:
     env:
       PLATFORM_DB_BLOG: "sqlite://blog.db"
     cmds:
-      - pkill -9 blog || true
       - go run ./cmd/blog
 
   playground:
+    desc: Run the vuego template playground
     cmd: go run github.com/titpetric/vuego/cmd/vuego-playground theme
 
   fmt:
-    desc: Format Go code
+    desc: Format code and organize imports
     cmds:
-      - go fmt ./...
-      - goimports -w .
+      - goimports -w -local $(go list .) .
+      - goimports-reviser -set-alias -format -imports-order "std,blanked,general,company,project" ./...
+      - gofumpt -w .
+      - go mod tidy
 
-  fmt-check:
+  fmt:check:
     desc: Check if code is formatted
     cmds:
-      - go fmt ./... && test -z "$(git diff)" || (echo "Code not formatted"; exit 1)
+      - test -z "$(goimports -l -local $(go list .) .)" || (echo "Code not formatted"; exit 1)
+      - test -z "$(gofumpt -l .)" || (echo "Code not gofumpt'd"; exit 1)
+
+  fmt:docs:
+    desc: Format documentation
+    cmds:
+      - task: mdox:fmt
 
   lint:
     desc: Run golangci-lint
     cmds:
+      - task: fmt
       - golangci-lint run ./...
 
   build:
@@ -37,48 +52,39 @@ tasks:
       - go build ./...
 
   test:
-    desc: Run all tests
+    desc: Run all tests with coverage
+    deps:
+      - fmt
+    env:
+      GOTOOLCHAIN: '{{.toolchain}}'
     cmds:
-      - go test -v ./...
+      - go test -failfast -count=1 -cover -coverpkg=./... -coverprofile=pkg.cov ./markdown ./storage
 
-  test-unit:
+  test:unit:
     desc: Run unit tests only
     cmds:
       - go test -v -short ./...
 
-  test-integration:
+  test:integration:
     desc: Run integration tests only
     cmds:
       - go test -v -run Integration ./storage
 
-  test-coverage:
-    desc: Run tests with coverage
+  cover:
+    desc: Generate coverage report and API documentation
     cmds:
-      - go test -v -coverprofile=coverage.out ./...
-      - go tool cover -html=coverage.out -o coverage.html
+      - go-fsck extract . --include-sources
+      - go-fsck docs > docs/api.md
+      - go tool cover -func=pkg.cov | summary coverfunc --json > pkg.cov.json
+      - go-fsck extract --pretty-json ./...
+      - go-fsck coverage -c pkg.cov.json -o go-fsck.json
+      - go-fsck coverage --template=docs/testing-coverage.md.tpl -v > docs/testing-coverage.md
+      - perl -pi -e 's/github.com\/titpetric/titpetric/g' docs/testing-coverage.md
+      - task: fmt:docs
 
-  test-coverage-check:
-    desc: Check test coverage meets minimum threshold
-    cmds:
-      - go test -v -coverprofile=coverage.out ./...
-      - go tool cover -func=coverage.out | tail -1
-
-  bench:
-    desc: Run benchmarks
-    cmds:
-      - go test -bench=. -benchmem ./...
-
-  bench-cpu:
-    desc: Run benchmarks with CPU profiling
-    cmds:
-      - go test -bench=. -benchmem -cpuprofile=cpu.prof ./...
-      - go tool pprof -http=:8080 cpu.prof
-
-  bench-memory:
-    desc: Run benchmarks with memory profiling
-    cmds:
-      - go test -bench=. -benchmem -memprofile=mem.prof ./...
-      - go tool pprof -http=:8080 mem.prof
+  uncover:
+    desc: Show uncovered source
+    cmd: uncover pkg.cov
 
   vet:
     desc: Run go vet
@@ -98,24 +104,44 @@ tasks:
   clean:
     desc: Clean build artifacts and test files
     cmds:
-      - rm -f coverage.out coverage.html
-      - rm -f cpu.prof mem.prof
+      - rm -f pkg.cov pkg.cov.json go-fsck.json
+      - rm -f docs/testing-coverage.md docs/api.md
       - go clean ./...
+
+  bench:
+    desc: Run benchmarks
+    deps:
+      - fmt
+    cmds:
+      - go test -bench=. -benchmem ./...
+
+  bench:cpu:
+    desc: Run benchmarks with CPU profiling
+    cmds:
+      - go test -bench=. -benchmem -cpuprofile=cpu.prof ./...
+      - go tool pprof -http=:8080 cpu.prof
+
+  bench:memory:
+    desc: Run benchmarks with memory profiling
+    cmds:
+      - go test -bench=. -benchmem -memprofile=mem.prof ./...
+      - go tool pprof -http=:8080 mem.prof
 
   ci:
     desc: Run CI checks (fmt, lint, vet, test, coverage)
     cmds:
-      - task fmt-check
-      - task lint
-      - task vet
-      - task test
-      - task test-coverage-check
+      - task: fmt:check
+      - task: lint
+      - task: vet
+      - task: test
+      - task: cover
 
   all:
-    desc: Format, lint, vet, test, and build
+    desc: Format, lint, vet, test, build, and coverage
     cmds:
-      - task fmt
-      - task lint
-      - task vet
-      - task test
-      - task build
+      - task: fmt
+      - task: lint
+      - task: vet
+      - task: test
+      - task: build
+      - task: cover
