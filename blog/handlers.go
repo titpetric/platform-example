@@ -1,6 +1,7 @@
 package blog
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -14,6 +15,9 @@ import (
 	"github.com/titpetric/platform-example/blog/view"
 )
 
+//go:embed theme/*
+var themeFS embed.FS
+
 // Handlers handles HTTP requests for the blog module
 type Handlers struct {
 	repository *storage.Storage
@@ -22,7 +26,7 @@ type Handlers struct {
 
 // NewHandlers creates a new Handlers instance with the given storage
 func NewHandlers(repo *storage.Storage) (*Handlers, error) {
-	views, err := view.NewViews(os.DirFS("theme"))
+	views, err := view.NewViews(NewOverlayFS(os.DirFS("theme"), themeFS))
 	if err != nil {
 		return nil, err
 	}

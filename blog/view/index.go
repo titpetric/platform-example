@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v3"
 
 	"github.com/titpetric/platform-example/blog/model"
 )
