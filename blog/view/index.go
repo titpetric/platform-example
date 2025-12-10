@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 
+	"gopkg.in/yaml.v3"
+
 	"github.com/titpetric/platform-example/blog/model"
 )
 
@@ -51,9 +53,25 @@ func fillTemplateData(w *map[string]any) error {
 	if err := loadFile(w, "themes", "config/themes.json"); err != nil {
 		return err
 	}
-	if err := loadFile(w, "meta", "config/meta.json"); err != nil {
+	if err := loadFileYaml(w, "meta", "config/meta.yml"); err != nil {
 		return err
 	}
+	return nil
+}
+
+func loadFileYaml(w *map[string]any, key string, filename string) error {
+	var result any
+	f, err := os.Open(filename)
+	if err != nil {
+		return fmt.Errorf("error opening %s: %w", filename, err)
+	}
+	defer f.Close()
+
+	if err := yaml.NewDecoder(f).Decode(&result); err != nil {
+		return fmt.Errorf("error loading %s: %w", filename, err)
+	}
+	(*w)[key] = result
+	log.Println("loaded ok:", key, filename)
 	return nil
 }
 
