@@ -16,7 +16,8 @@ tasks:
     env:
       PLATFORM_DB_BLOG: "sqlite://blog.db"
     cmds:
-      - go run ./cmd/blog
+      - task: build
+      - cd appdata && ../blog && cd -
 
   playground:
     desc: Run the vuego template playground
