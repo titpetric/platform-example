@@ -18,22 +18,38 @@ func NewOverlayFS(upper, lower fs.FS) *OverlayFS {
 }
 
 func (o *OverlayFS) Open(name string) (fs.File, error) {
-	f, err := o.Upper.Open(name)
-	if err == nil {
-		return f, nil
+	if o.Upper != nil {
+		f, err := o.Upper.Open(name)
+		if err == nil {
+			return f, nil
+		}
 	}
-	return o.Lower.Open(name)
+	if o.Lower != nil {
+		return o.Lower.Open(name)
+	}
+	return nil, fs.ErrNotExist
 }
 
 func (o *OverlayFS) ReadDir(name string) ([]fs.DirEntry, error) {
-	upperDir, upperErr := fs.ReadDir(o.Upper, name)
-	lowerDir, lowerErr := fs.ReadDir(o.Lower, name)
+	var upperDir []fs.DirEntry
+	var upperErr error
+	var lowerDir []fs.DirEntry
+	var lowerErr error
+
+	if o.Upper != nil {
+		upperDir, upperErr = fs.ReadDir(o.Upper, name)
+	} else {
+		upperErr = fs.ErrNotExist
+	}
+
+	if o.Lower != nil {
+		lowerDir, lowerErr = fs.ReadDir(o.Lower, name)
+	} else {
+		lowerErr = fs.ErrNotExist
+	}
 
 	if upperErr != nil && lowerErr != nil {
-		if upperErr != nil {
-			return nil, upperErr
-		}
-		return nil, lowerErr
+		return nil, upperErr
 	}
 
 	merged := make(map[string]fs.DirEntry)
@@ -49,12 +65,23 @@ func (o *OverlayFS) ReadDir(name string) ([]fs.DirEntry, error) {
 		entries = append(entries, e)
 	}
 
+	sort.Slice(entries, func(i, j int) bool {
+		return entries[i].Name() < entries[j].Name()
+	})
+
 	return entries, nil
 }
 
 func (o *OverlayFS) Glob(pattern string) ([]string, error) {
-	upperMatches, _ := fs.Glob(o.Upper, pattern)
-	lowerMatches, _ := fs.Glob(o.Lower, pattern)
+	var upperMatches []string
+	if o.Upper != nil {
+		upperMatches, _ = fs.Glob(o.Upper, pattern)
+	}
+
+	var lowerMatches []string
+	if o.Lower != nil {
+		lowerMatches, _ = fs.Glob(o.Lower, pattern)
+	}
 
 	matchMap := make(map[string]struct{})
 	for _, m := range lowerMatches {
