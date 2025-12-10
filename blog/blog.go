@@ -3,6 +3,7 @@ package blog
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -12,7 +13,6 @@ import (
 	_ "modernc.org/sqlite"
 
 	"github.com/titpetric/platform"
-	"github.com/titpetric/platform-app/modules/user"
 	yaml "gopkg.in/yaml.v3"
 
 	"github.com/titpetric/platform-example/blog/model"
@@ -31,12 +31,25 @@ type Module struct {
 
 	// Articles index for in-memory access
 	articles map[string]*model.Article
+
+	// Theme fs that combines embedded theme and live theme/ folder.
+	themeFS fs.FS
 }
 
 // NewModule creates a new blog module instance
 func NewModule(dataDir string) *Module {
+	// Sub into the theme directory since embed.FS includes the directory name
+	themeSub, _ := fs.Sub(themeFS, "theme")
+
+	// Check if local theme directory exists
+	var overlay fs.FS = themeSub
+	if _, err := os.Stat("theme"); err == nil {
+		overlay = NewOverlayFS(os.DirFS("theme"), themeSub)
+	}
+
 	return &Module{
 		dataDir:  dataDir,
+		themeFS:  overlay,
 		articles: make(map[string]*model.Article),
 	}
 }
@@ -49,15 +62,16 @@ func (m *Module) Name() string {
 // Mount registers the blog routes with the router
 func (m *Module) Mount(_ context.Context, r platform.Router) error {
 	// Create handlers using the module's storage
-	h, err := NewHandlers(m.repository)
+	h, err := NewHandlers(m.repository, m.themeFS)
 	if err != nil {
 		return err
 	}
 
-	assetFS := http.StripPrefix("/assets", http.FileServer(http.Dir("theme/assets")))
+	// assetFS := http.StripPrefix("/assets", http.FileServer(http.FS(m.themeFS)))
+	assetFS := http.FileServer(http.FS(m.themeFS))
 
 	r.Group(func(r platform.Router) {
-		r.Use(user.Middleware)
+		// r.Use(user.Middleware)
 
 		// Static files
 		r.Get("/assets/css/*", func(w http.ResponseWriter, r *http.Request) { assetFS.ServeHTTP(w, r) })

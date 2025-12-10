@@ -39,7 +39,7 @@ func (g *Generator) Generate(ctx context.Context) error {
 	}
 
 	// Create handlers for rendering
-	h, err := NewHandlers(g.module.repository)
+	h, err := NewHandlers(g.module.repository, g.module.themeFS)
 	if err != nil {
 		return fmt.Errorf("failed to create handlers: %w", err)
 	}
