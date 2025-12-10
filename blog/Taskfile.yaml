@@ -2,6 +2,7 @@ version: "3"
 
 includes:
   mdox: ./Taskfile.mdox.yml
+  docker: ./Taskfile.docker.yml
 
 vars:
   COVERAGE_MIN: "70"
@@ -55,9 +56,11 @@ tasks:
       - golangci-lint run ./...
 
   build:
-    desc: Build the module
+    desc: Build the app
+    env:
+      CGO_ENABLED: 0
     cmds:
-      - go build ./...
+      - go build ./cmd/blog
 
   test:
     desc: Run all tests with coverage
@@ -113,7 +116,6 @@ tasks:
     desc: Clean build artifacts and test files
     cmds:
       - rm -f pkg.cov pkg.cov.json go-fsck.json
-      - rm -f docs/testing-coverage.md docs/api.md
       - go clean ./...
 
   bench:
@@ -153,3 +155,13 @@ tasks:
       - task: test
       - task: build
       - task: cover
+
+  up:
+    cmds:
+      - task: build
+      - task: docker:build
+      - task: docker:up
+
+  down:
+    cmds:
+      - task: docker:down
