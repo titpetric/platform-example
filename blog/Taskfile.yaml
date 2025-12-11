@@ -26,7 +26,7 @@ tasks:
   generate:
     desc: Generate blog snapshot
     env:
-      PLATFORM_DB_BLOG: "sqlite://file:blog.db"
+      PLATFORM_DB_BLOG: "sqlite://file:cache/blog.db"
     cmds:
       - task: fmt
       - cd appdata && go run ../cmd/generate && cd -
