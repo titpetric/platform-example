@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package platform.v1;
+
+option go_package = "github.com/titpetric/platform/proto/v1";
+
+message Client {
+	string id = 1;
+	string name = 2;
+
+	bool active = 10;
+	bool deleted = 11;
+
+	int64 created_at = 20;
+}
+
+service ClientService {
+	rpc Create(CreateClientRequest) returns (CreateClientResponse);
+	rpc Update(UpdateClientRequest) returns (UpdateClientResponse);
+}
+
+message CreateClientRequest {
+	string name = 1;
+}
+
+message CreateClientResponse {
+	Client response = 1;
+}
+
+message UpdateClientRequest {
+	string id = 1;
+	string name = 2;
+	bool active = 3;
+	bool deleted = 4;
+}
+
+message UpdateClientResponse {
+	Client response = 1;
+}

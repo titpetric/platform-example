@@ -86,5 +86,12 @@ func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string,
 
 // escapeXML escapes special XML characters
 func escapeXML(s any) string {
-	return html.EscapeString(s.(string))
+	switch v := s.(type) {
+	case string:
+		return html.EscapeString(v)
+	case []byte:
+		return html.EscapeString(string(v))
+	default:
+		return html.EscapeString(fmt.Sprintf("%v", v))
+	}
 }

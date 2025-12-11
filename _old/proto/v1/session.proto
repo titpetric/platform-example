@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package platform.v1;
+
+import "proto/v1/user.proto";
+
+option go_package = "github.com/titpetric/platform/proto/v1";
+
+service SessionService {
+	// Get returns an User based on Session ID.
+	rpc Get(GetSessionRequest) returns (GetSessionResponse);
+}
+
+message GetSessionRequest {
+	string session_id = 1;
+}
+
+message GetSessionResponse {
+	User response = 1;
+}

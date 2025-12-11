@@ -3,6 +3,7 @@ package blog
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -113,12 +114,11 @@ func (g *Generator) generateIndexPage(ctx context.Context, h *Handlers) error {
 
 // generateStaticPages generates all .vuego pages from theme/pages directory recursively
 func (g *Generator) generateStaticPages(ctx context.Context, h *Handlers) error {
-	pagesDir := filepath.Join("theme", "pages")
-	return g.walkPages(ctx, h, pagesDir, "")
+	return g.walkPages(ctx, h, "pages", "")
 }
 
 func (g *Generator) walkPages(ctx context.Context, h *Handlers, dirPath string, relPath string) error {
-	entries, err := os.ReadDir(dirPath)
+	entries, err := fs.ReadDir(g.module.themeFS, dirPath)
 	if err != nil {
 		return fmt.Errorf("failed to read pages directory %s: %w", dirPath, err)
 	}
@@ -145,7 +145,7 @@ func (g *Generator) walkPages(ctx context.Context, h *Handlers, dirPath string, 
 		}
 
 		pageName := strings.TrimSuffix(entry.Name(), ".vuego")
-		templatePath := filepath.Join("pages", entryRelPath)
+		templatePath := filepath.Join("pages", strings.ReplaceAll(entryRelPath, string(filepath.Separator), "/"))
 
 		// Determine output path and prepare data
 		var outputPath string
@@ -153,7 +153,7 @@ func (g *Generator) walkPages(ctx context.Context, h *Handlers, dirPath string, 
 
 		if entry.Name() == "index.vuego" {
 			// index.vuego in subdirectories becomes subdir/index.html
-			parentDir := strings.TrimSuffix(entryRelPath, "/index.vuego")
+			parentDir := strings.TrimSuffix(entryRelPath, string(filepath.Separator)+"index.vuego")
 			outputDir := filepath.Join(g.outputDir, parentDir)
 			if err := os.MkdirAll(outputDir, 0o755); err != nil {
 				return err
@@ -161,7 +161,7 @@ func (g *Generator) walkPages(ctx context.Context, h *Handlers, dirPath string, 
 			outputPath = filepath.Join(outputDir, "index.html")
 
 			// Special handling for blog/index.vuego
-			if parentDir == "blog" {
+			if parentDir == "blog" || parentDir == "blog"+string(filepath.Separator) {
 				articles, err := h.repository.GetArticles(ctx, 0, 9999)
 				if err != nil {
 					return fmt.Errorf("failed to fetch articles for blog page: %w", err)
@@ -176,7 +176,20 @@ func (g *Generator) walkPages(ctx context.Context, h *Handlers, dirPath string, 
 		} else {
 			// Regular pages become page-name.html
 			outputPath = filepath.Join(g.outputDir, pageName+".html")
-			templateData = map[string]interface{}{}
+
+			// Special handling for blog.vuego
+			if pageName == "blog" {
+				articles, err := h.repository.GetArticles(ctx, 0, 9999)
+				if err != nil {
+					return fmt.Errorf("failed to fetch articles for blog page: %w", err)
+				}
+				templateData = map[string]interface{}{
+					"articles": articles,
+					"total":    len(articles),
+				}
+			} else {
+				templateData = map[string]interface{}{}
+			}
 		}
 
 		// Render the page
