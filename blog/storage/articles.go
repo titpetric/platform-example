@@ -24,7 +24,7 @@ func GetArticleBySlug(ctx context.Context, db *sqlx.DB, slug string) (*model.Art
 
 // GetArticles retrieves all articles ordered by date descending
 func GetArticles(ctx context.Context, db *sqlx.DB, start, length int) ([]model.Article, error) {
-	article := &model.Article{}
+	var article *model.Article
 	query := article.Select(model.WithOrderBy("date DESC"), model.WithLimit(start, length))
 
 	var articles []model.Article
@@ -40,7 +40,7 @@ func GetArticles(ctx context.Context, db *sqlx.DB, start, length int) ([]model.A
 func SearchArticles(ctx context.Context, db *sqlx.DB, find string) ([]model.Article, error) {
 	searchTerm := "%" + find + "%"
 
-	article := &model.Article{}
+	var article *model.Article
 	query := article.Select(
 		model.WithWhere("title LIKE ? or description LIKE ? or slug LIKE ?"),
 		model.WithOrderBy("date DESC"),
