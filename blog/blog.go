@@ -196,7 +196,6 @@ func (m *Module) parseMarkdownFile(filePath string) (*model.Article, error) {
 
 	// Extract YAML front matter
 	var meta model.Metadata
-	var markdownContent string
 
 	// Check if file starts with ---
 	if strings.HasPrefix(content, "---") {
@@ -205,27 +204,19 @@ func (m *Module) parseMarkdownFile(filePath string) (*model.Article, error) {
 			if err := yaml.Unmarshal([]byte(parts[1]), &meta); err != nil {
 				return nil, fmt.Errorf("failed to parse YAML front matter: %w", err)
 			}
-			markdownContent = parts[2]
 		}
-	} else {
-		markdownContent = content
 	}
 
 	// Generate article ID and slug
 	fileName := filepath.Base(filePath)
 	slug := strings.TrimSuffix(fileName, filepath.Ext(fileName))
 	id := generateID(slug)
+	now := time.Now()
 
 	// Parse date
-	var date time.Time
-	if meta.Date != "" {
-		var err error
-		date, err = time.Parse("2006-01-02", meta.Date)
-		if err != nil {
-			date = time.Now()
-		}
-	} else {
-		date = time.Now()
+	var stamp *time.Time
+	if metaDate, err := time.Parse("2006-01-02", meta.Date); err == nil {
+		stamp = &metaDate
 	}
 
 	// Set default layout if not provided
@@ -239,14 +230,14 @@ func (m *Module) parseMarkdownFile(filePath string) (*model.Article, error) {
 		Slug:        slug,
 		Title:       meta.Title,
 		Description: meta.Description,
-		Content:     markdownContent,
-		Date:        date,
-		OGImage:     meta.OGImage,
+		Filename:    filePath,
+		Date:        stamp,
+		OgImage:     meta.OgImage,
 		Layout:      layout,
 		Source:      meta.Source,
 		URL:         "/blog/" + slug + "/",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		CreatedAt:   &now,
+		UpdatedAt:   &now,
 	}
 
 	return article, nil

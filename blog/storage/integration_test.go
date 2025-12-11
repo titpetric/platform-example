@@ -11,6 +11,14 @@ import (
 	"github.com/titpetric/platform-example/blog/model"
 )
 
+func timeNow() *time.Time {
+	return timePtr(time.Now())
+}
+
+func timePtr(v time.Time) *time.Time {
+	return &v
+}
+
 // TestStorageIntegration_FullLifecycle tests the complete storage lifecycle
 func TestStorageIntegration_FullLifecycle(t *testing.T) {
 	db := setupTestDB(t)
@@ -33,39 +41,30 @@ func TestStorageIntegration_FullLifecycle(t *testing.T) {
 			Slug:        "getting-started",
 			Title:       "Getting Started with Go",
 			Description: "Learn the basics of Go programming",
-			Content:     "# Getting Started\n\nGo is a modern programming language...",
-			Date:        time.Date(2024, 1, 10, 0, 0, 0, 0, time.UTC),
-			OGImage:     "/og/go.png",
+			Date:        timePtr(time.Date(2024, 1, 10, 0, 0, 0, 0, time.UTC)),
+			OgImage:     "/og/go.png",
 			Layout:      "post",
 			URL:         "/blog/getting-started/",
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
 		},
 		{
 			ID:          "article-2",
 			Slug:        "advanced-patterns",
 			Title:       "Advanced Go Patterns",
 			Description: "Master advanced patterns in Go",
-			Content:     "# Advanced Patterns\n\nOnce you know the basics...",
-			Date:        time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC),
-			OGImage:     "/og/patterns.png",
+			Date:        timePtr(time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC)),
+			OgImage:     "/og/patterns.png",
 			Layout:      "post",
 			URL:         "/blog/advanced-patterns/",
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
 		},
 		{
 			ID:          "article-3",
 			Slug:        "concurrency-guide",
 			Title:       "Concurrency Guide",
 			Description: "Understanding goroutines and channels",
-			Content:     "# Concurrency\n\nGoroutines are lightweight threads...",
-			Date:        time.Date(2024, 1, 20, 0, 0, 0, 0, time.UTC),
-			OGImage:     "/og/concurrency.png",
+			Date:        timePtr(time.Date(2024, 1, 20, 0, 0, 0, 0, time.UTC)),
+			OgImage:     "/og/concurrency.png",
 			Layout:      "post",
 			URL:         "/blog/concurrency-guide/",
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
 		},
 	}
 
@@ -97,7 +96,6 @@ func TestStorageIntegration_FullLifecycle(t *testing.T) {
 
 	// 7. Update article
 	article.Title = "Updated: Advanced Go Patterns"
-	article.UpdatedAt = time.Now()
 	err = storage.InsertArticle(ctx, article)
 	require.NoError(t, err)
 
@@ -123,7 +121,7 @@ func TestStorageIntegration_ConcurrentInserts(t *testing.T) {
 				ID:    fmt.Sprintf("concurrent-%d", idx),
 				Slug:  fmt.Sprintf("article-%d", idx),
 				Title: "Concurrent Article",
-				Date:  time.Now(),
+				Date:  timeNow(),
 			}
 			done <- storage.InsertArticle(ctx, article)
 		}(i)
@@ -153,7 +151,7 @@ func TestStorageIntegration_ReplaceOnDuplicate(t *testing.T) {
 		ID:    "valid-1",
 		Slug:  "valid-article",
 		Title: "Valid Article",
-		Date:  time.Now(),
+		Date:  timeNow(),
 	}
 	err := storage.InsertArticle(ctx, article1)
 	require.NoError(t, err)
@@ -163,7 +161,7 @@ func TestStorageIntegration_ReplaceOnDuplicate(t *testing.T) {
 		ID:    "valid-2",
 		Slug:  "valid-article", // duplicate slug
 		Title: "Replaced Article",
-		Date:  time.Now(),
+		Date:  timeNow(),
 	}
 	err = storage.InsertArticle(ctx, article2)
 	require.NoError(t, err)
@@ -193,24 +191,21 @@ func TestStorageIntegration_SearchAccuracy(t *testing.T) {
 			Slug:        "python-basics",
 			Title:       "Python for Beginners",
 			Description: "Learn Python programming language",
-			Content:     "Python is easy to learn and powerful",
-			Date:        time.Now(),
+			Date:        timeNow(),
 		},
 		{
 			ID:          "search-2",
 			Slug:        "go-performance",
 			Title:       "Go Performance Optimization",
 			Description: "Optimize Go applications",
-			Content:     "Go is fast and efficient",
-			Date:        time.Now(),
+			Date:        timeNow(),
 		},
 		{
 			ID:          "search-3",
 			Slug:        "rust-safety",
 			Title:       "Rust Memory Safety",
 			Description: "Understanding Rust's safety features",
-			Content:     "Rust prevents data races at compile time",
-			Date:        time.Now(),
+			Date:        timeNow(),
 		},
 	}
 
@@ -291,19 +286,19 @@ func TestStorageIntegration_DateOrdering(t *testing.T) {
 			ID:    "date-1",
 			Slug:  "middle",
 			Title: "Middle Article",
-			Date:  time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC),
+			Date:  timePtr(time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC)),
 		},
 		{
 			ID:    "date-2",
 			Slug:  "newest",
 			Title: "Newest Article",
-			Date:  time.Date(2024, 1, 20, 0, 0, 0, 0, time.UTC),
+			Date:  timePtr(time.Date(2024, 1, 20, 0, 0, 0, 0, time.UTC)),
 		},
 		{
 			ID:    "date-3",
 			Slug:  "oldest",
 			Title: "Oldest Article",
-			Date:  time.Date(2024, 1, 10, 0, 0, 0, 0, time.UTC),
+			Date:  timePtr(time.Date(2024, 1, 10, 0, 0, 0, 0, time.UTC)),
 		},
 	}
 
@@ -350,37 +345,6 @@ func TestStorageIntegration_EmptyDatabase(t *testing.T) {
 	require.Error(t, err)
 }
 
-// TestStorageIntegration_LargeContent tests handling of large article content
-func TestStorageIntegration_LargeContent(t *testing.T) {
-	db := setupTestDB(t)
-	defer cleanupTestDB(t, db)
-
-	storage := NewStorage(db)
-	ctx := context.Background()
-
-	// Create article with large content
-	largeContent := ""
-	for i := 0; i < 1000; i++ {
-		largeContent += "This is a paragraph of content that will be repeated many times to create a large article.\n"
-	}
-
-	article := &model.Article{
-		ID:      "large-1",
-		Slug:    "large-article",
-		Title:   "Large Article",
-		Content: largeContent,
-		Date:    time.Now(),
-	}
-
-	err := storage.InsertArticle(ctx, article)
-	require.NoError(t, err)
-
-	// Retrieve and verify
-	retrieved, err := storage.GetArticleBySlug(ctx, "large-article")
-	require.NoError(t, err)
-	require.Equal(t, len(largeContent), len(retrieved.Content))
-}
-
 // TestStorageIntegration_SpecialCharacters tests handling of special characters
 func TestStorageIntegration_SpecialCharacters(t *testing.T) {
 	db := setupTestDB(t)
@@ -394,8 +358,7 @@ func TestStorageIntegration_SpecialCharacters(t *testing.T) {
 		Slug:        "special-chars",
 		Title:       "Article with \"quotes\" and 'apostrophes'",
 		Description: "Testing special chars: <html> & {json}",
-		Content:     "Code: `func() { return \"test\"; }`",
-		Date:        time.Now(),
+		Date:        timeNow(),
 	}
 
 	err := storage.InsertArticle(ctx, article)
@@ -406,7 +369,6 @@ func TestStorageIntegration_SpecialCharacters(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, article.Title, retrieved.Title)
 	require.Equal(t, article.Description, retrieved.Description)
-	require.Equal(t, article.Content, retrieved.Content)
 }
 
 // TestStorageIntegration_TimestampHandling tests proper timestamp handling
@@ -417,14 +379,11 @@ func TestStorageIntegration_TimestampHandling(t *testing.T) {
 	storage := NewStorage(db)
 	ctx := context.Background()
 
-	now := time.Now()
 	article := &model.Article{
-		ID:        "time-1",
-		Slug:      "time-test",
-		Title:     "Timestamp Test",
-		Date:      time.Date(2024, 6, 15, 14, 30, 45, 0, time.UTC),
-		CreatedAt: now,
-		UpdatedAt: now,
+		ID:    "time-1",
+		Slug:  "time-test",
+		Title: "Timestamp Test",
+		Date:  timePtr(time.Date(2024, 6, 15, 14, 30, 45, 0, time.UTC)),
 	}
 
 	err := storage.InsertArticle(ctx, article)
@@ -454,7 +413,7 @@ func TestStorageIntegration_IndexEfficiency(t *testing.T) {
 			ID:    "index-" + idx,
 			Slug:  "article-" + idx,
 			Title: "Article Number",
-			Date:  time.Now().AddDate(0, 0, -i),
+			Date:  timePtr(time.Now().AddDate(0, 0, -i)),
 		}
 		err := storage.InsertArticle(ctx, article)
 		require.NoError(t, err)

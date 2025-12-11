@@ -1,17 +1,17 @@
 -- Blog article table
 CREATE TABLE IF NOT EXISTS article (
-    id TEXT PRIMARY KEY,
-    slug TEXT NOT NULL UNIQUE,
-    title TEXT NOT NULL,
-    description TEXT,
-    content TEXT NOT NULL,
-    date DATETIME NOT NULL,
-    og_image TEXT,
-    layout TEXT DEFAULT 'post',
-    source TEXT,
-    url TEXT NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    `id` TEXT PRIMARY KEY,
+    `slug` TEXT NOT NULL UNIQUE,
+    `title` TEXT NOT NULL,
+    `filename` TEXT NOT NULL,
+    `description` TEXT,
+    `date` DATETIME NOT NULL,
+    `og_image` TEXT,
+    `layout` TEXT DEFAULT 'post',
+    `source` TEXT,
+    `url` TEXT NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Index for date-based queries (list, newest first)

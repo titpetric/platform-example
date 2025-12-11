@@ -14,7 +14,7 @@ tasks:
   default:
     desc: Start the blog service
     env:
-      PLATFORM_DB_BLOG: "sqlite://blog.db"
+      PLATFORM_DB_BLOG: "sqlite://file:cache/blog.db"
     cmds:
       - task: build
       - cd appdata && ../blog && cd -
@@ -156,6 +156,13 @@ tasks:
       - task: test
       - task: build
       - task: cover
+
+  migrate:blog:
+    desc: "Run blog module migrations"
+    cmds:
+      - mig migrate --db-driver sqlite --db-dsn="file:blog.db" --project blog --path ./schema --apply
+      - mig docs --db-driver sqlite --db-dsn="file:blog.db" --output=./docs/schema
+      - mig gen --db-driver sqlite --db-dsn="file:blog.db" --go.skip-json --output=./model
 
   up:
     cmds:

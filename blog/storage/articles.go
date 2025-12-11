@@ -2,7 +2,7 @@ package storage
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 
@@ -11,11 +11,7 @@ import (
 
 // GetArticleBySlug retrieves a single article by slug
 func GetArticleBySlug(ctx context.Context, db *sqlx.DB, slug string) (*model.Article, error) {
-	query := `
-	SELECT * FROM article
-	WHERE slug = ?
-	LIMIT 1
-	`
+	query := `SELECT * FROM article	WHERE slug=? LIMIT 1`
 
 	var article model.Article
 	err := db.GetContext(ctx, &article, query, slug)
@@ -28,11 +24,12 @@ func GetArticleBySlug(ctx context.Context, db *sqlx.DB, slug string) (*model.Art
 
 // GetArticles retrieves all articles ordered by date descending
 func GetArticles(ctx context.Context, db *sqlx.DB, start, length int) ([]model.Article, error) {
-	query := fmt.Sprintf(`SELECT * FROM article ORDER BY date DESC LIMIT %d, %d`, start, length)
+	var article *model.Article
+	query := article.Select(model.WithOrderBy("date DESC"), model.WithLimit(start, length))
 
 	var articles []model.Article
-	err := db.SelectContext(ctx, &articles, query)
-	if err != nil {
+
+	if err := db.SelectContext(ctx, &articles, query); err != nil {
 		return nil, err
 	}
 
@@ -40,17 +37,17 @@ func GetArticles(ctx context.Context, db *sqlx.DB, start, length int) ([]model.A
 }
 
 // SearchArticles performs a search on articles by title, description, or content
-func SearchArticles(ctx context.Context, db *sqlx.DB, query string) ([]model.Article, error) {
-	searchTerm := "%" + query + "%"
+func SearchArticles(ctx context.Context, db *sqlx.DB, find string) ([]model.Article, error) {
+	searchTerm := "%" + find + "%"
 
-	sqlQuery := `
-	SELECT * FROM article
-	WHERE title LIKE ? OR description LIKE ? OR slug LIKE ?
-	ORDER BY date DESC
-	`
+	var article *model.Article
+	query := article.Select(
+		model.WithWhere("title LIKE ? or description LIKE ? or slug LIKE ?"),
+		model.WithOrderBy("date DESC"),
+	)
 
 	var articles []model.Article
-	err := db.SelectContext(ctx, &articles, sqlQuery, searchTerm, searchTerm, searchTerm)
+	err := db.SelectContext(ctx, &articles, query, searchTerm, searchTerm, searchTerm)
 	if err != nil {
 		return nil, err
 	}
@@ -60,27 +57,17 @@ func SearchArticles(ctx context.Context, db *sqlx.DB, query string) ([]model.Art
 
 // InsertArticle inserts a new article into the database
 func InsertArticle(ctx context.Context, db *sqlx.DB, article *model.Article) error {
-	query := `
-	INSERT OR REPLACE INTO article (
-		id, slug, title, description, content, date,
-		og_image, layout, source, url, created_at, updated_at
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-	`
+	now := time.Now()
 
-	_, err := db.ExecContext(ctx, query,
-		article.ID,
-		article.Slug,
-		article.Title,
-		article.Description,
-		article.Content,
-		article.Date,
-		article.OGImage,
-		article.Layout,
-		article.Source,
-		article.URL,
-		article.CreatedAt,
-		article.UpdatedAt,
-	)
+	article.SetCreatedAt(now)
+	article.SetUpdatedAt(now)
+	if article.Date == nil {
+		article.SetDate(now)
+	}
+
+	query := article.Insert(model.WithStatement("INSERT OR REPLACE INTO"))
+
+	_, err := db.NamedExecContext(ctx, query, article)
 
 	return err
 }

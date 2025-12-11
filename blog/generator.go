@@ -66,9 +66,15 @@ func (g *Generator) Generate(ctx context.Context) error {
 	for _, modelArticle := range articles {
 		fmt.Printf("Generating blog/%s/index.html...\n", modelArticle.Slug)
 
+		content, err := os.ReadFile(modelArticle.Filename)
+		if err != nil {
+			return err
+		}
+
 		// Convert markdown to HTML
-		contentWithoutFrontMatter := view.StripFrontMatter(modelArticle.Content)
-		htmlContent := mdRenderer.Render([]byte(contentWithoutFrontMatter))
+		contentWithoutFrontMatter := view.StripFrontMatter(content)
+
+		htmlContent := mdRenderer.Render(contentWithoutFrontMatter)
 
 		// Create PostData
 		postData := h.views.PostFromArticle(&modelArticle, string(htmlContent))

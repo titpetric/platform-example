@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
+	"os"
 
 	chi "github.com/go-chi/chi/v5"
 
@@ -159,10 +160,15 @@ func (h *Handlers) GetArticleHTML(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
 
-	// Strip front matter and convert markdown to HTML with syntax highlighting
-	contentWithoutFrontMatter := view.StripFrontMatter(article.Content)
+	content, err := os.ReadFile(article.Filename)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	contentWithoutFrontMatter := view.StripFrontMatter(content)
 	mdRenderer := markdown.NewRenderer()
-	htmlContent := mdRenderer.Render([]byte(contentWithoutFrontMatter))
+	htmlContent := mdRenderer.Render(contentWithoutFrontMatter)
 
 	// Create PostData and render
 	postData := h.views.PostFromArticle(article, string(htmlContent))

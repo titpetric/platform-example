@@ -12,9 +12,9 @@ type PostData struct {
 	Slug        string
 	Title       string
 	Description string
-	OGImage     string
+	OgImage     string
 	Content     string
-	Date        time.Time
+	Date        *time.Time
 	Classnames  string
 }
 
@@ -24,7 +24,7 @@ func (d *PostData) Map() map[string]any {
 		"slug":        d.Slug,
 		"title":       d.Title,
 		"description": d.Description,
-		"ogImage":     d.OGImage,
+		"ogImage":     d.OgImage,
 		"content":     d.Content,
 		"date":        d.Date,
 		"classnames":  d.Classnames,
@@ -51,7 +51,7 @@ func (v *Views) PostFromArticle(article *model.Article, content string) *PostDat
 		Slug:        article.Slug,
 		Title:       article.Title,
 		Description: article.Description,
-		OGImage:     article.OGImage,
+		OgImage:     article.OgImage,
 		Content:     content,
 		Date:        article.Date,
 		Classnames:  "prose",

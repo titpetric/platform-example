@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"html"
+	"os"
 	"time"
 
 	"github.com/titpetric/platform-example/blog/model"
@@ -22,16 +23,18 @@ func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string,
 	}
 
 	// Find the most recent article date
-	var newestDate time.Time
+	newestDate := time.Now()
 	if len(articles) > 0 {
-		newestDate = articles[0].Date
+		newestDate = *articles[0].Date
 		for _, a := range articles {
-			if a.Date.After(newestDate) {
-				newestDate = a.Date
+			if a.Date == nil {
+				continue
+			}
+			articleDate := *a.Date
+			if articleDate.After(newestDate) {
+				newestDate = articleDate
 			}
 		}
-	} else {
-		newestDate = time.Now()
 	}
 
 	var language string
@@ -55,8 +58,14 @@ func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string,
 
 	// Add entries for each article
 	for _, article := range articles {
+
+		content, err := os.ReadFile(article.Filename)
+		if err != nil {
+			return "", err
+		}
+
 		// Strip front matter from content
-		contentWithoutFrontMatter := StripFrontMatter(article.Content)
+		content = StripFrontMatter(content)
 
 		entryXML := fmt.Sprintf(`  <entry>
     <title>%s</title>
@@ -65,7 +74,7 @@ func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string,
     <id>%s/blog/%s</id>
     <content xml:lang="%s" type="html">%s</content>
   </entry>
-`, escapeXML(article.Title), meta["url"], article.Slug, article.Date.Format(time.RFC3339), meta["url"], article.Slug, language, escapeXML(contentWithoutFrontMatter))
+`, escapeXML(article.Title), meta["url"], article.Slug, article.Date.Format(time.RFC3339), meta["url"], article.Slug, language, escapeXML(content))
 
 		xml += entryXML
 	}

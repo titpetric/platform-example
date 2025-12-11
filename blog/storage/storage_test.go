@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"testing"
-	"time"
 
 	_ "modernc.org/sqlite"
 
@@ -88,14 +87,10 @@ func TestInsertArticle(t *testing.T) {
 		Slug:        "test-article",
 		Title:       "Test Article",
 		Description: "This is a test article",
-		Content:     "# Test Article\n\nTest content",
-		Date:        time.Now(),
-		OGImage:     "/images/test.png",
+		OgImage:     "/images/test.png",
 		Layout:      "post",
 		Source:      "",
 		URL:         "/blog/test-article/",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
 	}
 
 	err := storage.InsertArticle(ctx, article)
@@ -131,13 +126,9 @@ func TestGetArticleBySlug(t *testing.T) {
 		Slug:        "my-article",
 		Title:       "My Article",
 		Description: "Description",
-		Content:     "Content",
-		Date:        time.Date(2024, 1, 15, 10, 0, 0, 0, time.UTC),
-		OGImage:     "/og.png",
+		OgImage:     "/og.png",
 		Layout:      "post",
 		URL:         "/blog/my-article/",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
 	}
 
 	storage.InsertArticle(ctx, article)
@@ -154,10 +145,6 @@ func TestGetArticleBySlug(t *testing.T) {
 
 	if retrieved.ID != "test-2" {
 		t.Errorf("expected ID 'test-2', got '%s'", retrieved.ID)
-	}
-
-	if retrieved.Content != "Content" {
-		t.Errorf("expected content 'Content', got '%s'", retrieved.Content)
 	}
 }
 
@@ -187,19 +174,16 @@ func TestGetArticles(t *testing.T) {
 			ID:    "test-3",
 			Slug:  "first",
 			Title: "First Article",
-			Date:  time.Date(2024, 1, 10, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			ID:    "test-4",
 			Slug:  "second",
 			Title: "Second Article",
-			Date:  time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			ID:    "test-5",
 			Slug:  "third",
 			Title: "Third Article",
-			Date:  time.Date(2024, 1, 20, 0, 0, 0, 0, time.UTC),
 		},
 	}
 
@@ -241,24 +225,18 @@ func TestSearchArticles(t *testing.T) {
 			Slug:        "go-programming",
 			Title:       "Learning Go Programming",
 			Description: "A comprehensive guide to Go",
-			Content:     "Go is a modern programming language...",
-			Date:        time.Now(),
 		},
 		{
 			ID:          "test-7",
 			Slug:        "rust-basics",
 			Title:       "Rust Basics",
 			Description: "Introduction to Rust programming",
-			Content:     "Rust provides memory safety...",
-			Date:        time.Now(),
 		},
 		{
 			ID:          "test-8",
 			Slug:        "go-frameworks",
 			Title:       "Go Web Frameworks",
 			Description: "Popular web frameworks in Go",
-			Content:     "There are many frameworks for Go web development...",
-			Date:        time.Now(),
 		},
 	}
 
@@ -314,7 +292,6 @@ func TestCountArticles(t *testing.T) {
 			ID:    "test-" + string(rune(i)),
 			Slug:  "article-" + string(rune(i)),
 			Title: "Article",
-			Date:  time.Now(),
 		}
 		storage.InsertArticle(ctx, article)
 	}
@@ -342,14 +319,12 @@ func TestInsertArticleUpdate(t *testing.T) {
 		ID:    "test-update",
 		Slug:  "update-test",
 		Title: "Original Title",
-		Date:  time.Now(),
 	}
 
 	storage.InsertArticle(ctx, article)
 
 	// Update the article
 	article.Title = "Updated Title"
-	article.UpdatedAt = time.Now()
 
 	err := storage.InsertArticle(ctx, article)
 	if err != nil {
@@ -379,7 +354,6 @@ func TestSchemaConstraints(t *testing.T) {
 		ID:    "test-constraint-1",
 		Slug:  "unique-slug",
 		Title: "Article 1",
-		Date:  time.Now(),
 	}
 
 	err := storage.InsertArticle(ctx, article1)
@@ -392,7 +366,6 @@ func TestSchemaConstraints(t *testing.T) {
 		ID:    "test-constraint-2",
 		Slug:  "unique-slug",
 		Title: "Article 2",
-		Date:  time.Now(),
 	}
 
 	err = storage.InsertArticle(ctx, article2)
@@ -443,11 +416,7 @@ func BenchmarkInsertArticle(b *testing.B) {
 		Slug:        "benchmark",
 		Title:       "Benchmark Article",
 		Description: "This is for benchmarking",
-		Content:     "Content here",
-		Date:        time.Now(),
 		URL:         "/blog/benchmark/",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
 	}
 
 	b.ResetTimer()
@@ -472,7 +441,6 @@ func BenchmarkGetArticleBySlug(b *testing.B) {
 			ID:    "bench-get-" + string(rune(i)),
 			Slug:  "article-" + string(rune(i)),
 			Title: "Article",
-			Date:  time.Now(),
 		}
 		storage.InsertArticle(ctx, article)
 	}
@@ -498,7 +466,6 @@ func BenchmarkGetAllArticles(b *testing.B) {
 			ID:    "bench-all-" + string(rune(i)),
 			Slug:  "article-" + string(rune(i)),
 			Title: "Article",
-			Date:  time.Now(),
 		}
 		storage.InsertArticle(ctx, article)
 	}
@@ -525,7 +492,6 @@ func BenchmarkSearchArticles(b *testing.B) {
 			Slug:        "article-" + string(rune(i)),
 			Title:       "Test Article Number " + string(rune(i)),
 			Description: "This is a test article about testing",
-			Date:        time.Now(),
 		}
 		storage.InsertArticle(ctx, article)
 	}

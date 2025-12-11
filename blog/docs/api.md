@@ -20,7 +20,7 @@ type Generator struct {
 // Handlers handles HTTP requests for the blog module
 type Handlers struct {
 	repository *storage.Storage
-	views      *template.Views
+	views      *view.Views
 }
 ```
 
@@ -37,15 +37,25 @@ type Module struct {
 
 	// Articles index for in-memory access
 	articles map[string]*model.Article
+
+	// Theme fs that combines embedded theme and live theme/ folder.
+	themeFS fs.FS
+}
+```
+
+```go
+type OverlayFS struct {
+	Upper fs.FS
+	Lower fs.FS
 }
 ```
 
 ## Function symbols
 
-- `func ContentNegotiation (next http.Handler) http.Handler`
 - `func NewGenerator (m *Module, outputDir string) *Generator`
-- `func NewHandlers (repo *storage.Storage) (*Handlers, error)`
+- `func NewHandlers (repo *storage.Storage, themeFS fs.FS) (*Handlers, error)`
 - `func NewModule (dataDir string) *Module`
+- `func NewOverlayFS (upper,lower fs.FS) *OverlayFS`
 - `func (*Generator) Generate (ctx context.Context) error`
 - `func (*Handlers) GetArticleHTML (w http.ResponseWriter, r *http.Request)`
 - `func (*Handlers) GetArticleJSON (w http.ResponseWriter, r *http.Request)`
@@ -54,20 +64,15 @@ type Module struct {
 - `func (*Handlers) ListArticlesHTML (w http.ResponseWriter, r *http.Request)`
 - `func (*Handlers) ListArticlesJSON (w http.ResponseWriter, r *http.Request)`
 - `func (*Handlers) SearchArticlesJSON (w http.ResponseWriter, r *http.Request)`
-- `func (*Module) Mount (_ context.Context, router platform.Router) error`
+- `func (*Module) Mount (_ context.Context, r platform.Router) error`
 - `func (*Module) Name () string`
 - `func (*Module) ScanMarkdownFiles (ctx context.Context) (int, error)`
 - `func (*Module) SetRepository (repo *storage.Storage)`
 - `func (*Module) Start (ctx context.Context) error`
 - `func (*Module) Stop (context.Context) error`
-
-### ContentNegotiation
-
-ContentNegotiation middleware handles Accept header for JSON vs HTML
-
-```go
-func ContentNegotiation(next http.Handler) http.Handler
-```
+- `func (*OverlayFS) Glob (pattern string) ([]string, error)`
+- `func (*OverlayFS) Open (name string) (fs.File, error)`
+- `func (*OverlayFS) ReadDir (name string) ([]fs.DirEntry, error)`
 
 ### NewGenerator
 
@@ -82,7 +87,7 @@ func NewGenerator(m *Module, outputDir string) *Generator
 NewHandlers creates a new Handlers instance with the given storage
 
 ```go
-func NewHandlers(repo *storage.Storage) (*Handlers, error)
+func NewHandlers(repo *storage.Storage, themeFS fs.FS) (*Handlers, error)
 ```
 
 ### NewModule
@@ -162,7 +167,7 @@ func (*Handlers) SearchArticlesJSON(w http.ResponseWriter, r *http.Request)
 Mount registers the blog routes with the router
 
 ```go
-func (*Module) Mount(_ context.Context, router platform.Router) error
+func (*Module) Mount(_ context.Context, r platform.Router) error
 ```
 
 ### Name
@@ -203,4 +208,28 @@ Stop is called when the module is shutting down
 
 ```go
 func (*Module) Stop(context.Context) error
+```
+
+### NewOverlayFS
+
+```go
+func NewOverlayFS(upper, lower fs.FS) *OverlayFS
+```
+
+### Glob
+
+```go
+func (*OverlayFS) Glob(pattern string) ([]string, error)
+```
+
+### Open
+
+```go
+func (*OverlayFS) Open(name string) (fs.File, error)
+```
+
+### ReadDir
+
+```go
+func (*OverlayFS) ReadDir(name string) ([]fs.DirEntry, error)
 ```
