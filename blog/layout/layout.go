@@ -44,7 +44,7 @@ func (r *Renderer) RenderPage(ctx context.Context, pagePath string, templateData
 
 	// Get layout name from template metadata
 	layoutName := "layouts/base.vuego"
-	if layout := tpl.GetString("layout"); layout != "" {
+	if layout, ok := tpl.GetVar("layout").(string); ok && layout != "" {
 		layoutName = fmt.Sprintf("layouts/%s.vuego", layout)
 	}
 
