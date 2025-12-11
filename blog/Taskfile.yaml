@@ -26,10 +26,10 @@ tasks:
   generate:
     desc: Generate blog snapshot
     env:
-      PLATFORM_DB_BLOG: "sqlite://blog.db"
+      PLATFORM_DB_BLOG: "sqlite://file:blog.db"
     cmds:
       - task: fmt
-      - go run ./cmd/generate
+      - cd appdata && go run ../cmd/generate && cd -
 
   fmt:
     desc: Format code and organize imports
