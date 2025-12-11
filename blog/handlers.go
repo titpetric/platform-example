@@ -116,13 +116,10 @@ func (h *Handlers) IndexHTML(w http.ResponseWriter, r *http.Request) {
 
 	// Create index component to render list
 	indexData := h.views.IndexFromArticles(articles)
-	html, err := h.views.Index(r.Context(), indexData)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("render failed: %v\n (%s)", err, html), http.StatusInternalServerError)
-		return
-	}
 
-	w.Write([]byte(html))
+	if err := h.views.Index(r.Context(), w, indexData); err != nil {
+		http.Error(w, fmt.Sprintf("render failed: %v", err), http.StatusInternalServerError)
+	}
 }
 
 // ListArticlesHTML returns an HTML list of articles
@@ -138,13 +135,10 @@ func (h *Handlers) ListArticlesHTML(w http.ResponseWriter, r *http.Request) {
 
 	// Create blog list and render
 	blogData := h.views.IndexFromArticles(articles)
-	html, err := h.views.Blog(r.Context(), blogData)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("render failed: %v", err), http.StatusInternalServerError)
-		return
-	}
 
-	w.Write([]byte(html))
+	if err := h.views.Blog(r.Context(), w, blogData); err != nil {
+		http.Error(w, fmt.Sprintf("render failed: %v", err), http.StatusInternalServerError)
+	}
 }
 
 // GetArticleHTML returns a single article as HTML
@@ -172,13 +166,10 @@ func (h *Handlers) GetArticleHTML(w http.ResponseWriter, r *http.Request) {
 
 	// Create PostData and render
 	postData := h.views.PostFromArticle(article, string(htmlContent))
-	html, err := h.views.Post(r.Context(), postData)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("render failed: %v", err), http.StatusInternalServerError)
-		return
-	}
 
-	w.Write([]byte(html))
+	if err := h.views.Post(r.Context(), w, postData); err != nil {
+		http.Error(w, fmt.Sprintf("render failed: %v", err), http.StatusInternalServerError)
+	}
 }
 
 // GetAtomFeed returns an Atom XML feed of all articles
@@ -192,12 +183,7 @@ func (h *Handlers) GetAtomFeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
 
-	// Generate atom feed
-	xml, err := h.views.AtomFeed(r.Context(), articles)
-	if err != nil {
+	if err := h.views.AtomFeed(r.Context(), w, articles); err != nil {
 		http.Error(w, fmt.Sprintf("feed generation failed: %v", err), http.StatusInternalServerError)
-		return
 	}
-
-	w.Write([]byte(xml))
 }

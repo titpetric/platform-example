@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"html"
+	"io"
 	"os"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 )
 
 // AtomFeed generates an Atom XML feed for articles
-func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string, error) {
+func (v *Views) AtomFeed(ctx context.Context, w io.Writer, articles []model.Article) error {
 	var meta map[string]any
 	var author map[string]any
 
@@ -42,7 +43,7 @@ func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string,
 		language = lang
 	}
 
-	xml := fmt.Sprintf(`<?xml version="1.0" encoding="utf-8"?>
+	io.WriteString(w, fmt.Sprintf(`<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:base="%s">
   <title>%s</title>
   <subtitle>Blogging general thoughts and rambles, code snippets, and front-end web dev discoveries</subtitle>
@@ -54,14 +55,14 @@ func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string,
     <name>%s</name>
     <email>%s</email>
   </author>
-`, meta["url"], escapeXML(meta["title"]), meta["url"], meta["url"], newestDate.Format(time.RFC3339), meta["url"], escapeXML(author["name"]), author["email"])
+`, meta["url"], escapeXML(meta["title"]), meta["url"], meta["url"], newestDate.Format(time.RFC3339), meta["url"], escapeXML(author["name"]), author["email"]))
 
 	// Add entries for each article
 	for _, article := range articles {
 
 		content, err := os.ReadFile(article.Filename)
 		if err != nil {
-			return "", err
+			return err
 		}
 
 		// Strip front matter from content
@@ -76,12 +77,12 @@ func (v *Views) AtomFeed(ctx context.Context, articles []model.Article) (string,
   </entry>
 `, escapeXML(article.Title), meta["url"], article.Slug, article.Date.Format(time.RFC3339), meta["url"], article.Slug, language, escapeXML(content))
 
-		xml += entryXML
+		io.WriteString(w, entryXML)
 	}
 
-	xml += `</feed>`
+	io.WriteString(w, `</feed>`)
 
-	return xml, nil
+	return nil
 }
 
 // escapeXML escapes special XML characters

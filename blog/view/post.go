@@ -2,6 +2,7 @@ package view
 
 import (
 	"context"
+	"io"
 	"time"
 
 	"github.com/titpetric/platform-example/blog/model"
@@ -32,7 +33,7 @@ func (d *PostData) Map() map[string]any {
 }
 
 // Post renders the post layout template
-func (v *Views) Post(ctx context.Context, data *PostData) (string, error) {
+func (v *Views) Post(ctx context.Context, w io.Writer, data *PostData) error {
 	// Build the context data
 	templateData := data.Map()
 	for k, v := range v.data {
@@ -42,7 +43,7 @@ func (v *Views) Post(ctx context.Context, data *PostData) (string, error) {
 	}
 
 	// Render the post layout
-	return v.RenderPage(ctx, "layouts/post.vuego", templateData)
+	return v.Render(ctx, w, "layouts/post.vuego", templateData)
 }
 
 // PostFromArticle creates PostData from an Article

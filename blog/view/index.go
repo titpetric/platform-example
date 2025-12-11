@@ -1,9 +1,11 @@
 package view
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -33,7 +35,7 @@ func (d *IndexData) Map() map[string]any {
 }
 
 // Index renders the blog index/list page
-func (v *Views) Index(ctx context.Context, data *IndexData) (string, error) {
+func (v *Views) Index(ctx context.Context, w io.Writer, data *IndexData) error {
 	// Build the context data
 	templateData := data.Map()
 	for k, v := range v.data {
@@ -43,7 +45,7 @@ func (v *Views) Index(ctx context.Context, data *IndexData) (string, error) {
 	}
 
 	// Render the index page
-	return v.RenderPage(ctx, "pages/index.vuego", templateData)
+	return v.Render(ctx, w, "pages/index.vuego", templateData)
 }
 
 func fillTemplateData(w *map[string]any) error {
@@ -92,7 +94,7 @@ func loadFile(w *map[string]any, key string, filename string) error {
 }
 
 // Blog renders the blog list page
-func (v *Views) Blog(ctx context.Context, data *IndexData) (string, error) {
+func (v *Views) Blog(ctx context.Context, w io.Writer, data *IndexData) error {
 	// Build the context data
 	templateData := data.Map()
 	for k, v := range v.data {
@@ -101,8 +103,12 @@ func (v *Views) Blog(ctx context.Context, data *IndexData) (string, error) {
 		}
 	}
 
-	// Render the blog page
-	return v.RenderPage(ctx, "pages/blog.vuego", templateData)
+	var buf bytes.Buffer
+	if err := v.Render(ctx, &buf, "pages/blog.vuego", templateData); err != nil {
+		return err
+	}
+	_, err := io.Copy(w, &buf)
+	return err
 }
 
 // IndexFromArticles creates IndexData from a list of articles
