@@ -3,8 +3,9 @@ package layout
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"io"
 	"io/fs"
+	"log"
 
 	"github.com/titpetric/vuego"
 )
@@ -24,49 +25,44 @@ func NewRenderer(root fs.FS, data map[string]any) *Renderer {
 }
 
 // template creates a vuego template with shared data and custom functions
-func (r *Renderer) template(data map[string]any, funcs map[string]interface{}) vuego.Template {
-	tpl := vuego.Load(r.root, vuego.WithLessProcessor())
-	return tpl.Funcs(funcs).Fill(data)
+func (r *Renderer) template(data map[string]any) vuego.Template {
+	tpl := vuego.NewFS(r.root, vuego.WithLessProcessor())
+	return tpl.Funcs(Funcs).Fill(data)
 }
 
-// RenderPage loads a page template, renders it, and wraps it with a layout
-// It passes templateData to the page, then adds the rendered page as "content" to the layout
-func (r *Renderer) RenderPage(ctx context.Context, pagePath string, templateData map[string]any, funcs map[string]interface{}) (string, error) {
-	tpl := r.template(templateData, funcs)
+// Render loads a template, and if the template contains "layout" in the metadata, it will
+// load another template from layouts/%s.vuego; Layouts can be chained so one layout can
+// again trigger another layout, like `blog.vuego -> layouts/post.vuego -> layouts/base.vuego`.
+func (r *Renderer) Render(ctx context.Context, w io.Writer, filename string, data map[string]any) error {
+	tpl := r.template(data)
+	for {
+		var buf bytes.Buffer
+		if err := tpl.Load(filename).Render(ctx, &buf); err != nil {
+			return err
+		}
 
-	// Render the page template
-	var pageBuf bytes.Buffer
-	if err := tpl.Render(ctx, &pageBuf, pagePath); err != nil {
-		return "", err
+		log.Printf("Render: %s %q", filename, tpl.Get("layout"))
+
+		content := buf.String()
+		data["content"] = content
+
+		layout := tpl.Get("layout")
+		if layout == "" {
+			filename = "layouts/base.vuego"
+			break
+		}
+
+		delete(data, "layout")
+		tpl = r.template(data)
+		filename = "layouts/" + layout + ".vuego"
+		continue
 	}
+	log.Printf("Render: %s %q", filename, tpl.Get("layout"))
 
-	templateData["content"] = pageBuf.String()
-
-	// Get layout name from template metadata
-	layoutName := "layouts/base.vuego"
-	if layout, ok := tpl.GetVar("layout").(string); ok && layout != "" {
-		layoutName = fmt.Sprintf("layouts/%s.vuego", layout)
+	var buf bytes.Buffer
+	if err := tpl.Load(filename).Render(ctx, &buf); err != nil {
+		return err
 	}
-
-	// Render with layout
-	return r.RenderLayout(ctx, layoutName, templateData, funcs)
-}
-
-// RenderLayout renders a layout template with the provided data
-func (r *Renderer) RenderLayout(ctx context.Context, layoutPath string, data map[string]any, funcs map[string]interface{}) (string, error) {
-	// Merge shared data with provided data
-	mergedData := make(map[string]any)
-	for k, v := range r.data {
-		mergedData[k] = v
-	}
-	for k, v := range data {
-		mergedData[k] = v
-	}
-
-	// Render the layout with merged data
-	var layoutBuf bytes.Buffer
-	if err := r.template(mergedData, funcs).Render(ctx, &layoutBuf, layoutPath); err != nil {
-		return "", err
-	}
-	return layoutBuf.String(), nil
+	_, err := io.Copy(w, &buf)
+	return err
 }
