@@ -22,13 +22,13 @@ func TestRenderPageWithLayout(t *testing.T) {
 		},
 		"pages/post.vuego": &fstest.MapFile{
 			Data: []byte(`---
-layout: post
+layout: "post"
 ---
 PostContent`),
 		},
 		"pages/index.vuego": &fstest.MapFile{
 			Data: []byte(`---
-layout: index
+layout: "index"
 ---
 IndexContent`),
 		},
@@ -41,13 +41,22 @@ IndexContent`),
 	renderer := NewRenderer(fsys, sharedData)
 	ctx := context.Background()
 
-	t.Run("page content is wrapped in layout", func(t *testing.T) {
+	t.Run("page content is wrapped in default base layout", func(t *testing.T) {
 		output, err := renderer.RenderPage(ctx, "pages/post.vuego", map[string]any{}, nil)
 		assert.NoError(t, err)
-		// Should use default base layout since front matter layout detection happens elsewhere
 		assert.Contains(t, output, "BASE: [")
 		assert.Contains(t, output, "PostContent")
 		assert.Contains(t, output, "]")
+	})
+
+	t.Run("custom layout can be specified via RenderLayout directly", func(t *testing.T) {
+		// Test the layout selection path by calling RenderLayout directly with a custom layout
+		output, err := renderer.RenderLayout(ctx, "layouts/post.vuego", map[string]any{
+			"content": "CustomContent",
+		}, nil)
+		assert.NoError(t, err)
+		assert.Contains(t, output, "POST: [")
+		assert.Contains(t, output, "CustomContent")
 	})
 
 	t.Run("shared data is available in layout", func(t *testing.T) {
