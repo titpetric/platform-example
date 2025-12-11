@@ -12,26 +12,29 @@ Low cognitive complexity means there are few conditional branches to cover. Test
 
 | Status | Package                                      | Coverage | Cognitive | Lines |
 |--------|----------------------------------------------|----------|-----------|-------|
-| ❌     | titpetric/platform-example/blog              | 12.57%   | 116       | 703   |
+| ❌     | titpetric/platform-example/blog              | 11.78%   | 133       | 758   |
 | ❌     | titpetric/platform-example/blog/cmd/blog     | 0.00%    | 2         | 22    |
 | ❌     | titpetric/platform-example/blog/cmd/generate | 0.00%    | 5         | 51    |
+| ❌     | titpetric/platform-example/blog/layout       | 0.00%    | 5         | 52    |
 | ❌     | titpetric/platform-example/blog/markdown     | 72.00%   | 10        | 141   |
 | ❌     | titpetric/platform-example/blog/model        | 24.00%   | 35        | 213   |
 | ✅     | titpetric/platform-example/blog/schema       | 0.00%    | 0         | 0     |
 | ✅     | titpetric/platform-example/blog/storage      | 90.06%   | 9         | 100   |
-| ❌     | titpetric/platform-example/blog/view         | 0.00%    | 37        | 266   |
+| ❌     | titpetric/platform-example/blog/view         | 0.00%    | 35        | 247   |
 
 ## Functions
 
 | Status | Package                                      | Function                      | Coverage | Cognitive |
 |--------|----------------------------------------------|-------------------------------|----------|-----------|
 | ❌     | titpetric/platform-example/blog              | Generator.Generate            | 0.00%    | 12        |
-| ❌     | titpetric/platform-example/blog              | Generator.copyAssets          | 0.00%    | 9         |
+| ❌     | titpetric/platform-example/blog              | Generator.copyAssets          | 0.00%    | 2         |
+| ❌     | titpetric/platform-example/blog              | Generator.copyEmbeddedAssets  | 0.00%    | 8         |
+| ❌     | titpetric/platform-example/blog              | Generator.copyLocalAssets     | 0.00%    | 9         |
 | ❌     | titpetric/platform-example/blog              | Generator.generateArticlePage | 0.00%    | 2         |
 | ❌     | titpetric/platform-example/blog              | Generator.generateFeed        | 0.00%    | 2         |
 | ❌     | titpetric/platform-example/blog              | Generator.generateIndexPage   | 0.00%    | 2         |
 | ✅     | titpetric/platform-example/blog              | Generator.generateStaticPages | 0.00%    | 0         |
-| ❌     | titpetric/platform-example/blog              | Generator.walkPages           | 0.00%    | 30        |
+| ❌     | titpetric/platform-example/blog              | Generator.walkPages           | 0.00%    | 37        |
 | ❌     | titpetric/platform-example/blog              | Handlers.GetArticleHTML       | 0.00%    | 3         |
 | ❌     | titpetric/platform-example/blog              | Handlers.GetArticleJSON       | 0.00%    | 2         |
 | ❌     | titpetric/platform-example/blog              | Handlers.GetAtomFeed          | 0.00%    | 2         |
@@ -59,6 +62,10 @@ Low cognitive complexity means there are few conditional branches to cover. Test
 | ❌     | titpetric/platform-example/blog/cmd/blog     | start                         | 0.00%    | 1         |
 | ❌     | titpetric/platform-example/blog/cmd/generate | generate                      | 0.00%    | 4         |
 | ❌     | titpetric/platform-example/blog/cmd/generate | main                          | 0.00%    | 1         |
+| ✅     | titpetric/platform-example/blog/layout       | NewRenderer                   | 0.00%    | 0         |
+| ❌     | titpetric/platform-example/blog/layout       | Renderer.RenderLayout         | 0.00%    | 3         |
+| ❌     | titpetric/platform-example/blog/layout       | Renderer.RenderPage           | 0.00%    | 2         |
+| ✅     | titpetric/platform-example/blog/layout       | Renderer.template             | 0.00%    | 0         |
 | ✅     | titpetric/platform-example/blog/markdown     | NewRenderer                   | 100.00%  | 0         |
 | ✅     | titpetric/platform-example/blog/markdown     | Renderer.Render               | 100.00%  | 0         |
 | ✅     | titpetric/platform-example/blog/markdown     | Renderer.highlightCodeBlocks  | 100.00%  | 0         |
@@ -130,10 +137,9 @@ Low cognitive complexity means there are few conditional branches to cover. Test
 | ✅     | titpetric/platform-example/blog/view         | Views.IndexFromArticles       | 0.00%    | 0         |
 | ❌     | titpetric/platform-example/blog/view         | Views.Post                    | 0.00%    | 3         |
 | ✅     | titpetric/platform-example/blog/view         | Views.PostFromArticle         | 0.00%    | 0         |
-| ❌     | titpetric/platform-example/blog/view         | Views.RenderLayout            | 0.00%    | 1         |
-| ❌     | titpetric/platform-example/blog/view         | Views.RenderPage              | 0.00%    | 2         |
-| ✅     | titpetric/platform-example/blog/view         | Views.template                | 0.00%    | 0         |
-| ✅     | titpetric/platform-example/blog/view         | escapeXML                     | 0.00%    | 0         |
+| ✅     | titpetric/platform-example/blog/view         | Views.RenderLayout            | 0.00%    | 0         |
+| ✅     | titpetric/platform-example/blog/view         | Views.RenderPage              | 0.00%    | 0         |
+| ❌     | titpetric/platform-example/blog/view         | escapeXML                     | 0.00%    | 1         |
 | ❌     | titpetric/platform-example/blog/view         | fillTemplateData              | 0.00%    | 3         |
 | ❌     | titpetric/platform-example/blog/view         | loadFile                      | 0.00%    | 2         |
 | ❌     | titpetric/platform-example/blog/view         | loadFileYaml                  | 0.00%    | 2         |
