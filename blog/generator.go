@@ -1,6 +1,7 @@
 package blog
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/fs"
@@ -103,13 +104,14 @@ func (g *Generator) generateIndexPage(ctx context.Context, h *Handlers) error {
 	}
 
 	indexData := h.views.IndexFromArticles(articles)
-	html, err := h.views.Index(ctx, indexData)
-	if err != nil {
+
+	var buf bytes.Buffer
+	if err := h.views.Index(ctx, &buf, indexData); err != nil {
 		return err
 	}
 
 	indexPath := filepath.Join(g.outputDir, "index.html")
-	return os.WriteFile(indexPath, []byte(html), 0o644)
+	return os.WriteFile(indexPath, buf.Bytes(), 0o644)
 }
 
 // generateStaticPages generates all .vuego pages from theme/pages directory recursively
@@ -193,13 +195,13 @@ func (g *Generator) walkPages(ctx context.Context, h *Handlers, dirPath string, 
 		}
 
 		// Render the page
-		html, err := h.views.RenderPage(ctx, templatePath, templateData)
-		if err != nil {
+		var buf bytes.Buffer
+		if err := h.views.Render(ctx, &buf, templatePath, templateData); err != nil {
 			return fmt.Errorf("failed to render page %s: %w", templatePath, err)
 		}
 
 		// Write the file
-		if err := os.WriteFile(outputPath, []byte(html), 0o644); err != nil {
+		if err := os.WriteFile(outputPath, buf.Bytes(), 0o644); err != nil {
 			return fmt.Errorf("failed to write page %s: %w", outputPath, err)
 		}
 
@@ -211,8 +213,8 @@ func (g *Generator) walkPages(ctx context.Context, h *Handlers, dirPath string, 
 
 // generateArticlePage generates an individual article page
 func (g *Generator) generateArticlePage(ctx context.Context, h *Handlers, postData *view.PostData) error {
-	html, err := h.views.Post(ctx, postData)
-	if err != nil {
+	var buf bytes.Buffer
+	if err := h.views.Post(ctx, &buf, postData); err != nil {
 		return err
 	}
 
@@ -222,7 +224,7 @@ func (g *Generator) generateArticlePage(ctx context.Context, h *Handlers, postDa
 	}
 
 	articlePath := filepath.Join(articleDir, "index.html")
-	return os.WriteFile(articlePath, []byte(html), 0o644)
+	return os.WriteFile(articlePath, buf.Bytes(), 0o644)
 }
 
 // generateFeed generates the feed.xml file
@@ -232,13 +234,13 @@ func (g *Generator) generateFeed(ctx context.Context, h *Handlers) error {
 		return err
 	}
 
-	xml, err := h.views.AtomFeed(ctx, articles)
-	if err != nil {
+	var buf bytes.Buffer
+	if err := h.views.AtomFeed(ctx, &buf, articles); err != nil {
 		return err
 	}
 
 	feedPath := filepath.Join(g.outputDir, "feed.xml")
-	return os.WriteFile(feedPath, []byte(xml), 0o644)
+	return os.WriteFile(feedPath, buf.Bytes(), 0o644)
 }
 
 // copyAssets copies static assets from theme/assets (both embedded and local) to output directory
