@@ -241,10 +241,55 @@ func (g *Generator) generateFeed(ctx context.Context, h *Handlers) error {
 	return os.WriteFile(feedPath, []byte(xml), 0o644)
 }
 
-// copyAssets copies static assets from theme/assets to output directory
+// copyAssets copies static assets from theme/assets (both embedded and local) to output directory
 func (g *Generator) copyAssets() error {
-	assetsSrcDir := filepath.Join("theme", "assets")
 	assetsDestDir := filepath.Join(g.outputDir, "assets")
+
+	// First, copy embedded theme assets using the overlay FS
+	if err := g.copyEmbeddedAssets(assetsDestDir); err != nil {
+		return err
+	}
+
+	// Then, copy local theme/assets if it exists (local overrides embedded)
+	if err := g.copyLocalAssets(assetsDestDir); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// copyEmbeddedAssets copies assets from the embedded theme filesystem
+func (g *Generator) copyEmbeddedAssets(assetsDestDir string) error {
+	return fs.WalkDir(g.module.themeFS, "assets", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Get relative path within assets
+		relPath, err := filepath.Rel("assets", path)
+		if err != nil {
+			return err
+		}
+
+		destPath := filepath.Join(assetsDestDir, relPath)
+
+		if d.IsDir() {
+			return os.MkdirAll(destPath, 0o755)
+		}
+
+		// Read from embedded FS and write to dest
+		data, err := fs.ReadFile(g.module.themeFS, path)
+		if err != nil {
+			return err
+		}
+
+		return os.WriteFile(destPath, data, 0o644)
+	})
+}
+
+// copyLocalAssets copies assets from local theme/assets directory, overriding embedded assets
+func (g *Generator) copyLocalAssets(assetsDestDir string) error {
+	assetsSrcDir := filepath.Join("theme", "assets")
 
 	// Check if source exists
 	if _, err := os.Stat(assetsSrcDir); os.IsNotExist(err) {

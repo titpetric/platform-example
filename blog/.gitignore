@@ -1,6 +1,7 @@
 /blog
 /blog.db
 /public
+/appdata/public
 /*.cov
 /*.json
 /*.test
