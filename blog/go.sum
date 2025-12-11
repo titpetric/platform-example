@@ -92,8 +92,8 @@ github.com/titpetric/platform v0.0.6 h1:2Xb5N/5DYxsBPx3IczaP3ZTKonAGlJoaZo23b2Aq
 github.com/titpetric/platform v0.0.6/go.mod h1:9T/xN1Kg9G4hXE69ZRy1vhfyKspg70tiz0hrQ9ddjFQ=
 github.com/titpetric/platform-app v0.0.0-20251210143634-3a75b1f5af29 h1:CPwppMjYJv+t1Isq6H8EbwDzUcd6RbQwZTiny7mAxoo=
 github.com/titpetric/platform-app v0.0.0-20251210143634-3a75b1f5af29/go.mod h1:lLKRF+sRviOgpflU3xx2VeIsqssyuEskcLuLcrJ7Bf0=
-github.com/titpetric/vuego v0.0.7 h1:zaakH5KxI74aoMrYV44OL6/xiG/vX+U8pgGGayC4GrM=
-github.com/titpetric/vuego v0.0.7/go.mod h1:tuR0wIh24D2AidyIvofJQhqZlqnVERshozmpmYcDrvs=
+github.com/titpetric/vuego v0.1.0 h1:cpSwZHBzs2WJj4yy7vdeFPmB17vuVGFsM0vw+5Qtm9k=
+github.com/titpetric/vuego v0.1.0/go.mod h1:tuR0wIh24D2AidyIvofJQhqZlqnVERshozmpmYcDrvs=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=
 go.opentelemetry.io/auto/sdk v1.2.1/go.mod h1:KRTj+aOaElaLi+wW1kO/DZRXwkF4C5xPbEe3ZiIhN7Y=
 go.opentelemetry.io/otel v1.39.0 h1:8yPrr/S0ND9QEfTfdP9V+SiwT4E0G7Y5MO7p85nis48=

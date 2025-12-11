@@ -10,7 +10,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/titpetric/platform v0.0.6
 	github.com/titpetric/platform-app v0.0.0-20251210143634-3a75b1f5af29
-	github.com/titpetric/vuego v0.0.7
+	github.com/titpetric/vuego v0.1.0
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.40.1
 )
